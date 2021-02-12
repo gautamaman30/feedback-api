@@ -1,0 +1,26 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const index_1 = require("./controllers/index");
+const app = express_1.default();
+app.use(express_1.default.json());
+app.use(index_1.controller.logUpdatedData.bind(index_1.controller));
+app.get('/api/user/:user_id', index_1.controller.getUserById.bind(index_1.controller));
+app.get('/api/feedback/', index_1.controller.getFeedbacks.bind(index_1.controller));
+app.get('/api/user/feedback/:user_id', index_1.controller.getFeedbacksByUser.bind(index_1.controller));
+app.get('/api/technology/:name', index_1.controller.getTechnology.bind(index_1.controller));
+app.post('/api/user/:user_id', index_1.controller.postNewUser.bind(index_1.controller));
+app.post('/api/technology/:user_id', index_1.controller.postTechnology.bind(index_1.controller));
+app.post('/api/feedback/:user_id', index_1.controller.postFeedback.bind(index_1.controller));
+app.delete('/api/user/:user_id', index_1.controller.deleteUser.bind(index_1.controller));
+app.delete('/api/technology/:user_id', index_1.controller.deleteTechnology.bind(index_1.controller));
+app.delete('/api/feedback/:user_id', index_1.controller.deleteFeedback.bind(index_1.controller));
+app.put('/api/technology/:user_id', index_1.controller.updateTechnology.bind(index_1.controller));
+app.put('/api/feedback/:user_id', index_1.controller.updateFeedback.bind(index_1.controller));
+app.put('/api/count/feedback/:feedback_id', index_1.controller.updateFeedbackCount.bind(index_1.controller));
+app.put('/api/status/feedback/:user_id', index_1.controller.updateFeedbackStatus.bind(index_1.controller));
+const PORT = process.env.PORT || process.argv[2] || 3000;
+app.listen(PORT, () => console.log(`server is running at ${PORT}`));
