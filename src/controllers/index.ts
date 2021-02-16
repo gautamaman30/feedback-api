@@ -4,7 +4,7 @@ import {User, Feedback, Technology} from '../components/index'
 import {generateId, convertArrayToSet} from '../utils/index'
 
 
-class Controller{
+export class Controller{
 
     getUserById(req: Request, res: Response){
         try{
@@ -157,7 +157,7 @@ class Controller{
 
             if(!user_id) throw new Error("Bad request");
 
-            if(!req.body.name) throw new Error("Bad request");
+            if(!req.body.name) throw new Error("Technology name is required");
 
             const index = this.checkUserExist("user_id", user_id);
             if(index === null) throw new Error("Admin not found");
@@ -209,8 +209,8 @@ class Controller{
 
             if(!user_id) throw new Error("Bad request");
 
-            if(!req.body.name) throw new Error("Bad request");
-            if(!req.body.details) throw new Error("Bad request");
+            if(!req.body.name) throw new Error("Technology name is required");
+            if(!req.body.details) throw new Error("Technology details is required");
 
             const index = this.checkUserExist("user_id", user_id);
             if(index === null) throw new Error("Admin not found");
@@ -292,7 +292,7 @@ class Controller{
             const user_id: string = req.params.user_id;         
 
             if(!user_id) throw new Error("Bad request");
-            if(!req.body.user_id) throw new Error("Bad request");
+            if(!req.body.user_id) throw new Error("User id is required");
 
             const admin_index = this.checkUserExist("user_id", user_id);
             if(admin_index === null) throw new Error('Admin not found');
@@ -318,7 +318,7 @@ class Controller{
             const user_id: string = req.params.user_id;         
 
             if(!user_id) throw new Error("Bad request");
-            if(!req.body.name) throw new Error("Bad request");
+            if(!req.body.name) throw new Error("Technology name is required");
 
             const admin_index = this.checkUserExist("user_id", user_id);
             if(admin_index === null) throw new Error('Admin not found');
@@ -343,7 +343,7 @@ class Controller{
             const user_id: string = req.params.user_id;         
 
             if(!user_id) throw new Error("Bad request");
-            if(!req.body.feedback_id) throw new Error("Bad request");
+            if(!req.body.feedback_id) throw new Error("Feedback id is required");
 
             const admin_index = this.checkUserExist("user_id", user_id);
             if(admin_index === null) throw new Error('Admin not found');
@@ -492,5 +492,3 @@ class Controller{
         });
     }
 }
-
-export const controller = new Controller();

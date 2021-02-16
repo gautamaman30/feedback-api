@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.controller = void 0;
+exports.Controller = void 0;
 const index_1 = require("../data-access/index");
 const index_2 = require("../utils/index");
 class Controller {
@@ -157,7 +157,7 @@ class Controller {
             if (!user_id)
                 throw new Error("Bad request");
             if (!req.body.name)
-                throw new Error("Bad request");
+                throw new Error("Technology name is required");
             const index = this.checkUserExist("user_id", user_id);
             if (index === null)
                 throw new Error("Admin not found");
@@ -212,9 +212,9 @@ class Controller {
             if (!user_id)
                 throw new Error("Bad request");
             if (!req.body.name)
-                throw new Error("Bad request");
+                throw new Error("Technology name is required");
             if (!req.body.details)
-                throw new Error("Bad request");
+                throw new Error("Technology details is required");
             const index = this.checkUserExist("user_id", user_id);
             if (index === null)
                 throw new Error("Admin not found");
@@ -275,6 +275,8 @@ class Controller {
             const user_index = this.checkUserExist("name", req.body.name);
             if (user_index === null)
                 throw new Error('User not found');
+            if (index_1.users[user_index].role === "admin")
+                throw new Error('Admin cannot add feedback count');
             for (let i of index_1.feedbacks[feedback_index].count) {
                 if (i === req.body.name) {
                     throw new Error("Count already exist");
@@ -296,7 +298,7 @@ class Controller {
             if (!user_id)
                 throw new Error("Bad request");
             if (!req.body.user_id)
-                throw new Error("Bad request");
+                throw new Error("User id is required");
             const admin_index = this.checkUserExist("user_id", user_id);
             if (admin_index === null)
                 throw new Error('Admin not found');
@@ -325,7 +327,7 @@ class Controller {
             if (!user_id)
                 throw new Error("Bad request");
             if (!req.body.name)
-                throw new Error("Bad request");
+                throw new Error("Technology name is required");
             const admin_index = this.checkUserExist("user_id", user_id);
             if (admin_index === null)
                 throw new Error('Admin not found');
@@ -350,7 +352,7 @@ class Controller {
             if (!user_id)
                 throw new Error("Bad request");
             if (!req.body.feedback_id)
-                throw new Error("Bad request");
+                throw new Error("Feedback id is required");
             const admin_index = this.checkUserExist("user_id", user_id);
             if (admin_index === null)
                 throw new Error('Admin not found');
@@ -488,4 +490,4 @@ class Controller {
         });
     }
 }
-exports.controller = new Controller();
+exports.Controller = Controller;

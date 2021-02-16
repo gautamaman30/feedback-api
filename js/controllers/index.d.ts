@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-declare class Controller {
+export declare class Controller {
     getUserById(req: Request, res: Response): void;
     getTechnology(req: Request, res: Response): void;
     getFeedbacks(req: Request, res: Response): void;
@@ -24,5 +24,3 @@ declare class Controller {
     private filterFeedback;
     private sortFeedback;
 }
-export declare const controller: Controller;
-export {};
