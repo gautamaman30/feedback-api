@@ -1,6 +1,6 @@
 import express from "express"
 import http from "http"
-import {AppRoutes} from "./routes/index"
+import {RoutesHandler} from "./routes/index"
 
 
 const app: express.Application = express();
@@ -9,7 +9,7 @@ const server: http.Server = http.createServer(app);
 
 app.use(express.json());
 
-new AppRoutes(app).configureRoutes();
+new RoutesHandler(app).configureRoutes();
 
 
 const PORT = process.env.PORT || process.argv[2] || 3000;

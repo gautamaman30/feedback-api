@@ -1,23 +1,31 @@
-import {Request, Response, NextFunction} from "express"
-import {users, feedbacks, technologies} from '../data-access/index'
-import {User, Feedback, Technology} from '../components/index'
-import {generateId, convertArrayToSet} from '../utils/index'
+import {Request, Response} from "express"
+import {Service} from "../services/index"
+import {convertStringToDate} from "../utils/index"
+const service = new Service();
 
 
 export class Controller{
 
-    getUserById(req: Request, res: Response){
+    getUser(req: Request, res: Response){
         try{
-            const user_id: string = req.params.user_id;
-
-            if(!user_id) throw new Error("Bad request");
-
-            let index = this.checkUserExist("user_id", user_id);
-            if(index !== null){
-                res.status(200);
-                res.send(users[index]);
+            const user_id = req.query.user_id;
+            const name = req.query.name;
+            
+            let result;
+            if(user_id){
+                result = service.checkUserExist("user_id", user_id);
+                if(result.error) throw new Error(result.error);       
             }
-            else throw new Error("Not found");
+            else if(name){
+                result = service.checkUserExist("name", name);
+                if(result.error) throw new Error(result.error);
+            } 
+            else{
+                result = service.getAllUsers();
+                if(result.error) throw new Error(result.error);
+            }
+            res.status(200);
+            res.send(result);
         } catch(e){
             console.log(e.message);
             res.status(404);
@@ -27,16 +35,25 @@ export class Controller{
 
     getTechnology(req: Request, res: Response){
         try{
-            const name: string = req.params.name;
+            const technology_id = req.query.technology_id;
+            const name = req.query.name;
 
-            if(!name) throw new Error("Bad request");
-
-            let index = this.checkTechnologyExist("name", name);
-            if(index !== null){
-                res.status(200);
-                res.send(technologies[index]);
+            let result;
+            
+            if(technology_id){
+                result = service.checkTechnologyExist("technology_id", technology_id);
+                if(result.error) throw new Error(result.error);       
             }
-            else throw new Error("Not found");
+            else if(name){
+                result = service.checkTechnologyExist("name", name);
+                if(result.error) throw new Error(result.error);
+            } 
+            else{
+                result = service.getAllTechnologies();
+                if(result.error) throw new Error(result.error);
+            }
+            res.status(200);
+            res.send(result);
         } catch(e){
             console.log(e.message);
             res.status(404);
@@ -46,25 +63,49 @@ export class Controller{
 
     getFeedbacks(req: Request, res: Response){
         try{
+            const admin_key = req.body.admin_key;
+            const feedback_id = req.query.feedback_id;
+            const filter = req.query.name;
+            const sort = req.query.sort;
             
-            let result = feedbacks; 
-            result = this.filterFeedback(result, "status", ['approved']);
-            if(req.query.filter){
-                if(req.query.filter === "user"){
-                    result = this.filterFeedback(result, "feedback_type", ['user']);
-                } else if(req.query.filter === "technology"){
-                    result = this.filterFeedback(result, "feedback_type", ['technology']);
+            let admin;
+            if(admin_key){
+                admin = service.checkUserExist("admin_key", admin_key);
+                if(admin.error) throw new Error(admin.error);
+            } 
+
+            let feedbacks = service.getAllFeedbacks();
+                
+            if(feedback_id){
+                const feedback: any = service.checkFeedbackExist("feedback_id", feedback_id);
+                if(feedback.error) throw new Error(feedback.error);
+
+                feedbacks = feedback;     
+            }
+            else if(filter || sort){
+                if(filter){
+                    if(filter === "user"){
+                        feedbacks = service.filterFeedback(feedbacks, "user_id", []);
+                    } else if(filter === "technology"){
+                        feedbacks = service.filterFeedback(feedbacks, "technology_id", []);
+                    } else if(filter === "status"){
+                        feedbacks = service.filterFeedback(feedbacks, "status", ["approved"]);
+                    }
+                } 
+                if(sort){
+                    if(sort === "date"){
+                        feedbacks = service.sortFeedback(feedbacks, "created_on");
+                    } else if(sort === "count"){
+                        feedbacks = service.sortFeedback(feedbacks, "count");
+                    } 
                 }
             } 
-            if(req.query.sort){
-                if(req.query.sort === "date"){
-                    result = this.sortFeedback(result, "created_on");
-                } else if(req.query.sort === "count"){
-                    result = this.sortFeedback(result, "count");
-                } 
-            }   
+
+            if(!admin){
+                feedbacks = service.filterFeedback(feedbacks, "status", ["approved"]);
+            }
             res.status(200);
-            res.send({"feedbacks": result});
+            res.send({"feedbacks": feedbacks});
         } catch(e){
             console.log(e.message);
             res.status(400);
@@ -74,18 +115,29 @@ export class Controller{
 
     getFeedbacksByUser(req: Request, res: Response){
         try{
-            const user_id: string = req.params.user_id;
+            const admin_key: string = req.body.admin_key;  
+            const user_id: any = req.query.user_id;
 
             if(!user_id) throw new Error("User id is required");
 
-            let index = this.checkUserExist("user_id", user_id);
-            if(index !== null){
-                let result = this.filterFeedback(feedbacks, "posted_by", [user_id]);
-                result = this.filterFeedback(result, "status", ['approved']);
-                res.status(200);
-                res.send({feedbacks: result});
+            let admin;
+            if(admin_key){
+                admin = service.checkUserExist("admin_key", admin_key);
+                if(admin.error) throw new Error(admin.error);
             }
-            else throw new Error("User not found");
+
+            const user: any = service.checkUserExist("user_id", user_id);
+            if(user.error) throw new Error(user.error);
+
+            let feedbacks = service.getAllFeedbacks();
+            feedbacks = service.filterFeedback(feedbacks, "posted_by", [user_id]);
+
+            if(!admin){
+                feedbacks = service.filterFeedback(feedbacks, "status", ['approved']);
+            }
+
+            res.status(200);
+            res.send({"feedbacks": feedbacks});
         } catch(e){
             console.log(e.message);
             res.status(404);
@@ -93,57 +145,37 @@ export class Controller{
         }
     }
 
-    postNewUser(req: Request, res: Response){
+    postUser(req: Request, res: Response){
         try{
-            const user_id: string = req.params.user_id;         
+            const admin_key: string = req.body.admin_key; 
+            const name: string = req.body.name;        
 
-            if(!user_id) throw new Error("Admin id is required");
+            if(!admin_key) throw new Error("Admin key is required, only admins can add new users ");
 
-            if(!req.body.name) throw new Error("User name is required");
+            if(!name) throw new Error("User name is required");
 
-            const admin_index = this.checkUserExist("user_id", user_id);
-            if(admin_index === null) throw new Error("Admin not found");
+            const admin: any = service.checkUserExist("admin_key", admin_key);
+            if(admin.error) throw new Error(admin.error);
             
-            if(users[admin_index].role === 'admin'){
-                const user_inex = this.checkUserExist("name", req.body.name);
-                if(user_inex !== null) throw new Error("User with this name already exist");
+            const user: any = service.checkUserExist("name", name);
+            if(user.error) throw new Error(user.error);
 
-                const result = this.addNewUser(req.body);
-                res.status(201);
-                res.send(result);
-            }
-            else throw new Error("Only admin can add new users");
-        } catch(e){
-            console.log(e.message);
-            res.status(400);
-            res.send({error: e.message});
-        }
-    }
+            let result: any;
+            let user_info: any = {name: name};
 
-    postFeedback(req: Request, res: Response){
-        try{
-            const user_id: string = req.params.user_id;         
+            if(req.body.email) user_info.email = req.body.email;
+            if(req.body.title) user_info.title = req.body.title;
+            if(req.body.date_of_birth) {
+                let date = convertStringToDate(req.body.date_of_birth);
+                if(!date) throw new Error("Wrong date, only accepted format is 'YYYY-MM-DD'");
+                user_info.date_of_birth = req.body.date;
+            }    
 
-            if(!user_id) throw new Error("Bad request");
-            
-            if(!req.body.name) throw new Error("User or technology name is required as feedback name");
-            
-            if(!req.body.feedback_type) throw new Error("type of feedback is required");
-           
-            if(!(req.body.feedback_type === 'user' || req.body.feedback_type === 'technology')) throw new Error("feedback type can be 'user' or 'technology' only");
-            
-            if(!req.body.content)  throw new Error("feedback content cannot be empty");
+            result = service.addUser(user_info);
+            if(result.error) throw new Error(result.error);
 
-            const index = this.checkUserExist("user_id", user_id);
-            if(index === null) throw new Error("User not found");
-
-            if(users[index].role === 'employee'){
-                const result = this.addNewFeedback(user_id, req.body);
-                if(result === null) throw new Error(`${req.body.feedback_type} not found`);
-                res.status(201);
-                res.send({feedback: result});
-            }
-            else throw new Error("Only admin can add new users");
+            res.status(201);
+            res.send(result);
         } catch(e){
             console.log(e.message);
             res.status(400);
@@ -153,23 +185,30 @@ export class Controller{
 
     postTechnology(req: Request, res: Response){
         try{
-            const user_id: string = req.params.user_id;         
-
-            if(!user_id) throw new Error("Bad request");
-
-            if(!req.body.name) throw new Error("Technology name is required");
-
-            const index = this.checkUserExist("user_id", user_id);
-            if(index === null) throw new Error("Admin not found");
+            const admin_key: string = req.body.admin_key; 
+            const name: string = req.body.name;
             
-            if(users[index].role === 'admin'){
-                if(this.checkTechnologyExist("name", req.body.name) !== null) throw new Error("Technology already exists");
-                
-                const result = this.addNewTechnology(req.body);
-                res.status(201);
-                res.send(result);
-            }
-            else throw new Error("Only admin can add new technologies");
+            if(!admin_key) throw new Error("Admin key is required, only admins can add new technologies");
+
+            if(!name) throw new Error("Technology name is required");
+            
+            const admin: any = service.checkUserExist("admin_key", admin_key);
+            if(admin.error) throw new Error(admin.error);
+            
+            const technology: any = service.checkTechnologyExist("name", name);
+            if(technology.error) throw new Error(technology.error);
+            
+            let result: any;
+            if(req.body.details){
+                const details: string = req.body.details;
+                result = service.addTechnology({name, details});
+            }  
+            else  result = service.addTechnology({name});
+
+            if(result.error) throw new Error(result.error);
+            
+            res.status(201);
+            res.send(result);
         } catch(e){
             console.log(e.message);
             res.status(400);
@@ -177,25 +216,44 @@ export class Controller{
         }
     }
 
-    updateFeedback(req: Request, res: Response){
+    postFeedback(req: Request, res: Response){
         try{
-            const user_id = req.params.user_id;
+            const admin_key: string = req.body.admin_key;         
+            const user_id: string = req.body.user_id;         
+            const name: string = req.body.name;
+            const feedback: string = req.body.feedback;
+            
+            if(admin_key) throw new Error("Only users can add new feedbacks");
 
-            if(!user_id) throw new Error("Bad request");
-            if(!req.body.feedback_id) throw new Error("Feedback id is required");
-            if(!req.body.content) throw new Error("Feedback content is required");
+            if(!user_id) throw new Error("User id is required");
+            
+            if(!name) throw new Error("Feedback name is required");       
+            
+            if(!feedback)  throw new Error("Feedback is required");
 
-            const user_index = this.checkUserExist("user_id", user_id);
-            if(user_index === null) throw new Error('User not found');
-            if(users[user_index].role === 'admin') throw new Error("Only user can edit feedbacks");
+            if(feedback.length === 0) throw new Error("Feedback cannot be empty");
 
-            const feedback_index = this.checkFeedbackExist("feedback_id", req.body.feedback_id);
-            if(feedback_index === null) throw new Error('Feedback not found');
-            if(feedbacks[feedback_index].posted_by !== users[user_index].user_id) throw new Error("Cannot update other's feedback");
+            const user: any = service.checkUserExist("user_id", user_id);
+            if(user.error) throw new Error(user.error);
 
-            feedbacks[feedback_index].content = req.body.content;
-            res.status(200);
-            res.send({"message": "feedback updated successfully"});
+            let feedback_info: any = {name: name, feedback: feedback, posted_by: user_id};
+
+            const check_user: any = service.checkUserExist("name", name);
+            if(!(check_user.error)) {
+                if(check_user.user_id === user_id) throw new Error("User cannot post feedbacks about themselves")
+                feedback_info.user_id = check_user.user_id;
+            } 
+            else{
+                const check_technology: any = service.checkTechnologyExist("name", name);
+                if(check_technology.error) throw new Error("Name not found");
+                feedback_info.technology_id = check_user.check_technology;
+            }
+            
+            const result: any = service.addFeedback(feedback_info);
+            if(result.error) throw new Error(result.error);
+            
+            res.status(201);
+            res.send(result);
         } catch(e){
             console.log(e.message);
             res.status(400);
@@ -205,25 +263,56 @@ export class Controller{
 
     updateTechnology(req: Request, res: Response){
         try{
-            const user_id: string = req.params.user_id;         
+            const admin_key: string = req.body.admin_key;         
 
-            if(!user_id) throw new Error("Bad request");
+            if(!admin_key) throw new Error("Admin key is required, only admins can update technologies");
 
             if(!req.body.name) throw new Error("Technology name is required");
+            
             if(!req.body.details) throw new Error("Technology details is required");
 
-            const index = this.checkUserExist("user_id", user_id);
-            if(index === null) throw new Error("Admin not found");
+            const admin: any = service.checkUserExist("admin_key", admin_key);
+            if(admin.error) throw new Error(admin.error);           
             
-            if(users[index].role === 'admin'){
-                const technology_index = this.checkTechnologyExist("name", req.body.name);
-                if(technology_index === null) throw new Error("Technology not found");
+            const technology: any = service.checkTechnologyExist("name", req.body.name);
+            if(technology.error) throw new Error(technology.error);
                 
-                technologies[technology_index].details = req.body.details;
-                res.status(200);
-                res.send(technologies[technology_index]);
-            }
-            else throw new Error("Only admin can edit technologies");
+            const result: any = service.editTechnology(req.body);
+            if(result.error) throw new Error(result.error);
+
+            res.status(200);
+            res.send(result);
+        } catch(e){
+            console.log(e.message);
+            res.status(400);
+            res.send({error: e.message});
+        }
+    }
+
+    updateFeedback(req: Request, res: Response){
+        try{
+            const admin_key: string = req.body.admin_key;   
+            const user_id: string = req.body.user_id;      
+            const feedback_id: string = req.body.feedback_id;         
+            const feedback: string = req.body.feedback;         
+            
+            if(admin_key) throw new Error("Only users can edit their feedback");
+            
+            if(!feedback_id) throw new Error("Feedback id is required");
+
+            const user: any = service.checkUserExist("user_id", user_id);
+            if(user.error) throw new Error(user.error); 
+
+            const check_feedback: any = service.checkFeedbackExist("feedback_id", feedback_id);
+            if(check_feedback.error) throw new Error(check_feedback.error);
+
+            if(check_feedback.posted_by !== user.user_id) throw new Error("User cannot update other user's feedbacks");
+            
+            const result: any = service.editFeedback({feedback_id, feedback});
+            if(result.error) throw new Error(result.error);
+
+            res.status(200);
+            res.send(result);
         } catch(e){
             console.log(e.message);
             res.status(400);
@@ -233,79 +322,55 @@ export class Controller{
 
     updateFeedbackStatus(req: Request, res: Response){
         try{
-            const user_id = req.params.user_id;
+            const admin_key: string = req.body.admin_key;   
+            const feedback_id: string = req.body.feedback_id;         
+            const status: string = req.body.status;         
+            
+            if(!admin_key) throw new Error("Admin key is required, only admin can change feedback's status");
+            
+            if(!feedback_id) throw new Error("Feedback id is required");
 
-            if(!user_id) throw new Error("Bad request");
-            if(!req.body.feedback_id) throw new Error("Feedback id is required");
-            if(!req.body.status) throw new Error("Status is required");
-            if(!(req.body.status === 'approved' || req.body.status === 'rejected')) throw new Error("Status can be 'approved' or 'rejected' only");
+            if(!status) throw new Error("Status is required");
+            if(!(status === 'approved' || status === 'rejected')) throw new Error("Status can be 'approved' or 'rejected' only");
 
+            const admin: any = service.checkUserExist("admin_key", admin_key);
+            if(admin.error) throw new Error(admin.error); 
 
-            const admin_index = this.checkUserExist("user_id", user_id);
-            if(admin_index === null) throw new Error('Admin not found');
-            if(users[admin_index].role === 'employee') throw new Error("Only admin can change feedback's status");
+            const feedback: any = service.editFeedbackStatus({feedback_id, status});
+            if(feedback.error) throw new Error(feedback.error);
 
-            const feedback_index = this.checkFeedbackExist("feedback_id", req.body.feedback_id);
-            if(feedback_index === null) throw new Error('Feedback not found');
-
-            feedbacks[feedback_index].status = req.body.status;
             res.status(200);
-            res.send({"message": `feedback ${req.body.status} successfully`});
+            res.send(feedback);
         } catch(e){
             console.log(e.message);
             res.status(400);
             res.send({error: e.message});
         }
     }
-    
-    updateFeedbackCount(req: Request, res: Response){
-        try{
-            const feedback_id = req.params.feedback_id;
-            if(!req.body.name) throw new Error("User name is required to add count");
-
-            const feedback_index = this.checkFeedbackExist("feedback_id", feedback_id);
-            if(feedback_index === null) throw new Error('Feedback not found');
-            
-            const user_index = this.checkUserExist("name", req.body.name);
-            if(user_index === null) throw new Error('User not found');
-            if(users[user_index].role === "admin") throw new Error('Admin cannot add feedback count');
-
-
-            for(let i of feedbacks[feedback_index].count){
-                if(i === req.body.name){
-                    throw new Error("Count already exist");
-                }
-            }
-            feedbacks[feedback_index].count.push(req.body.name);
-            res.status(200);
-            res.send({feedback: feedbacks[feedback_index]});
-        } catch(e){
-            console.log(e.message);
-            res.status(400);
-            res.send({error: e.message});
-        }
-    } 
 
     deleteUser(req: Request, res: Response){
         try{
 
-            const user_id: string = req.params.user_id;         
+            const admin_key: string = req.body.admin_key;  
+            const user_id: string = req.body.user_id;       
 
-            if(!user_id) throw new Error("Bad request");
-            if(!req.body.user_id) throw new Error("User id is required");
+            if(!admin_key) throw new Error("Admin key is required, only admins can delete users");
+            
+            if(!user_id) throw new Error("User id is required");
 
-            const admin_index = this.checkUserExist("user_id", user_id);
-            if(admin_index === null) throw new Error('Admin not found');
-            if(users[admin_index].role === 'employee') throw new Error("Only admin can delete users");
+            const admin: any = service.checkUserExist("admin_key", admin_key);
+            if(admin.error) throw new Error(admin.error);
+            
+            const user: any = service.checkUserExist("name", user_id);
+            if(user.error) throw new Error(user.error);
 
-            const user_index = this.checkUserExist("user_id", req.body.user_id);
-            if(!user_index) throw new Error('User not found');
-            if(users[user_index].role === 'employee') {
-                users.splice(user_index,1);
-                res.status(200);
-                res.send({"message": "User deleted successfully"});
-            }
-            else throw new Error("Admin cannot delete another admin");
+            if(user.admin_key) throw new Error("Admin cannot delete another admin");
+            
+            const result: any = service.removeUser({user_id});
+            if(result.error) throw new Error(result.error);
+
+            res.status(200);
+            res.send(result);
         } catch(e){
             console.log(e.message);
             res.status(400);
@@ -315,22 +380,25 @@ export class Controller{
     
     deleteTechnology(req: Request, res: Response){
         try{
-            const user_id: string = req.params.user_id;         
 
-            if(!user_id) throw new Error("Bad request");
-            if(!req.body.name) throw new Error("Technology name is required");
+            const admin_key: string = req.body.admin_key;
+            const name: string = req.body.name;         
 
-            const admin_index = this.checkUserExist("user_id", user_id);
-            if(admin_index === null) throw new Error('Admin not found');
-            if(users[admin_index].role === 'employee') throw new Error("Only admin can delete technoloies");
-
-            const technology_index = this.checkTechnologyExist("name", req.body.name);
-
-            if(technology_index === null) throw new Error("Technology not found");
+            if(!admin_key) throw new Error("Admin key is required, only admins can delete technologies");
             
-            technologies.splice(technology_index, 1);
+            if(!name) throw new Error("Technology name is required");
+
+            const admin: any = service.checkUserExist("admin_key", admin_key);
+            if(admin.error) throw new Error(admin.error);
+            
+            const technology: any = service.checkTechnologyExist("name", name);
+            if(technology.error) throw new Error(technology.error);
+
+            const result: any = service.removeTechnology({name});
+            if(result.error) throw new Error(result.error);
+
             res.status(200);
-            res.send({"message": "technology deleted successfully"});
+            res.send(result);
         } catch(e){
             console.log(e.message);
             res.status(400);
@@ -340,155 +408,28 @@ export class Controller{
 
     deleteFeedback(req: Request, res: Response){
         try{
-            const user_id: string = req.params.user_id;         
+            const admin_key: string = req.body.admin_key;         
+            const feedback_id: string = req.body.feedback_id;         
+            
+            if(!admin_key) throw new Error("Admin key is required, only admins can delete technologies");
+            
+            if(!feedback_id) throw new Error("Feedback id is required");
 
-            if(!user_id) throw new Error("Bad request");
-            if(!req.body.feedback_id) throw new Error("Feedback id is required");
+            const admin: any = service.checkUserExist("admin_key", admin_key);
+            if(admin.error) throw new Error(admin.error);
 
-            const admin_index = this.checkUserExist("user_id", user_id);
-            if(admin_index === null) throw new Error('Admin not found');
-            if(users[admin_index].role === 'employee') throw new Error("Only admin can delete feedbacks");
+            const feedback: any = service.checkFeedbackExist("feedback_id", feedback_id);
+            if(feedback.error) throw new Error(feedback.error);
 
-            const feedback_index = this.checkFeedbackExist("feedback_id", req.body.feedback_id);
-            if(feedback_index === null) throw new Error('Feedback not found');
+            const result: any = service.removeFeedback({feedback_id});
+            if(result.error) throw new Error(result.error);
 
-            feedbacks.splice(feedback_index,1);
             res.status(200);
-            res.send({"message": "feedback deleted successfully"});
+            res.send(result);
         } catch(e){
             console.log(e.message);
             res.status(400);
             res.send({error: e.message});
         }
-    }
-
-    logUpdatedData(req: Request, res: Response, next: NextFunction){
-        console.log("users");
-        console.log(users);
-        console.log("feedbacks");
-        console.log(feedbacks);
-        console.log("technologies");
-        console.log(technologies);
-        next();
-    }
-
-    private checkUserExist(key: string, value: any){
-        let check = -1;
-        for(let i = 0; i < users.length; i++){
-            let temp = users[i];
-            if(temp[key] === value){
-                return i;
-            }
-        }
-        return null;
-    }
-
-    private checkTechnologyExist(key: string, value: any){
-        let check = -1;
-        for(let i = 0; i < technologies.length; i++){
-            let temp = technologies[i];
-            if(temp[key] === value){
-                return i;
-            }
-        }
-        return null;
-    }
-
-    private checkFeedbackExist(key: string, value: any){
-        let check = -1;
-        for(let i = 0; i < feedbacks.length; i++){
-            let temp = feedbacks[i];
-            if(temp[key] === value){
-                return i;
-            }
-        }
-        return null;
-    }
-
-    private addNewUser(user_info){
-        let user: User;
-        user = {
-            user_id: generateId(),
-            name: user_info.name,
-            role: 'employee'
-        }
-        if(user_info.email) user.email = user_info.email;
-        if(user_info.title) user.title = user_info.title;
-        if(user_info.date_of_birth) user.date_of_birth = user_info.date_of_birth;
-
-        users.push(user);
-        return user;
-    }
-
-    private addNewTechnology(technology_info){
-        let technology: Technology;
-        technology = {
-            technology_id: generateId(),
-            name: technology_info.name,
-        }
-        if(technology_info.details) technology.details = technology_info.details;
-
-        technologies.push(technology);
-        return technology;
-    }
- 
-    private addNewFeedback(user_id: string, feedback_info){
-        
-        let feedback: Feedback;
-        
-        if(feedback_info.feedback_type === 'user'){
-           const user_index = this.checkUserExist("name", feedback_info.name);
-            
-           if(user_index === null) return null;
-
-            feedback = {
-                feedback_id: generateId(),
-                posted_by: user_id,
-                name: feedback_info.name,
-                feedback_type: 'user',
-                user_id: users[user_index].user_id,
-                content: feedback_info.content,
-                status: 'waiting',
-                created_on: new Date(),
-                count: []
-            }
-        } 
-        else{
-            const technology_index = this.checkTechnologyExist("name", feedback_info.name);
-                
-            if(technology_index === null) return null;
-
-            feedback = {
-                feedback_id: generateId(),
-                posted_by: user_id,
-                name: feedback_info.name,
-                feedback_type: 'technology',
-                technology_id: technologies[technology_index].technology_id,
-                content: feedback_info.content,
-                status: 'waiting',
-                created_on: new Date(),
-                count: []
-            }
-        } 
-
-        feedbacks.push(feedback);
-        return feedback;
-    }
-
-    private filterFeedback(feedback_array: Array<Feedback>, key: string, values: string[]){
-        let set = convertArrayToSet(values);
-        return feedback_array.filter((item) => item[key] && set.has(item[key])? true: false);
-    }
-
-    private sortFeedback(feedback_array: Array<Feedback>, key: string){
-        return feedback_array.sort((a , b) => {
-            if(key === "created_on"){
-                return b.created_on.getMilliseconds() - a.created_on.getMilliseconds();  
-            } 
-            if(key === "count"){
-                return b.count.length - a.count.length;
-            } 
-            return 0;
-        });
     }
 }

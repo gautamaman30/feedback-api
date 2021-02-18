@@ -10,24 +10,26 @@ export class RoutesHandler{
     }
 
     configureRoutes(): express.Application {
+        //User routes
+        this.app.get('/api/v1/get/users', controller.getUser.bind(controller));
+        this.app.post('/api/v1/add/user', controller.postUser.bind(controller));
+        this.app.delete('/api/v1/remove/user', controller.deleteUser.bind(controller));
         
-        this.app.get('/api/user/:user_id', controller.getUserById.bind(controller));
-        this.app.get('/api/feedback/', controller.getFeedbacks.bind(controller));
-        this.app.get('/api/user/feedback/:user_id', controller.getFeedbacksByUser.bind(controller));
-        this.app.get('/api/technology/:name', controller.getTechnology.bind(controller));
+        
+        //Technology routes
+        this.app.get('/api/v1/get/technologies', controller.getTechnology.bind(controller));
+        this.app.post('/api/v1/add/technology', controller.postTechnology.bind(controller));
+        this.app.delete('/api/v1/remove/technology', controller.deleteTechnology.bind(controller));
+        this.app.put('/api/v1/update/technology', controller.updateTechnology.bind(controller));
+        
 
-        this.app.post('/api/user/:user_id', controller.postNewUser.bind(controller));
-        this.app.post('/api/technology/:user_id', controller.postTechnology.bind(controller));
-        this.app.post('/api/feedback/:user_id', controller.postFeedback.bind(controller));
-
-        this.app.delete('/api/user/:user_id', controller.deleteUser.bind(controller));
-        this.app.delete('/api/technology/:user_id', controller.deleteTechnology.bind(controller));
-        this.app.delete('/api/feedback/:user_id', controller.deleteFeedback.bind(controller));
-
-        this.app.put('/api/technology/:user_id', controller.updateTechnology.bind(controller));
-        this.app.put('/api/feedback/:user_id', controller.updateFeedback.bind(controller));
-        this.app.put('/api/count/feedback/:feedback_id', controller.updateFeedbackCount.bind(controller));
-        this.app.put('/api/status/feedback/:user_id', controller.updateFeedbackStatus.bind(controller));
+        //Feedback routes
+        this.app.get('/api/v1/get/feedbacks', controller.getFeedbacks.bind(controller));
+        this.app.get('/api/v1/get/user/feedbacks', controller.getFeedbacksByUser.bind(controller));   
+        this.app.post('/api/v1/add/feedback', controller.postFeedback.bind(controller));
+        this.app.delete('/api/v1/remove/feedback', controller.deleteFeedback.bind(controller));
+        this.app.put('/api/v1/update/feedback', controller.updateFeedback.bind(controller));
+        this.app.put('/api/v1/update/feedback/status', controller.updateFeedbackStatus.bind(controller));
 
         return this.app;
     }
