@@ -1,3 +1,21 @@
+import fs from "fs"
+
+
+export function readFile(file_path: string){
+  return new Promise((resolve, reject) => {
+    fs.readFile(file_path,'utf8', (err, file) => {
+      if(err) {
+        console.log(err);
+        reject(err);
+      }
+      else{
+        resolve(file);
+      }
+    });
+  });
+}
+
+
 export function generateId(): string {
     const str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@";
     let id = '';
@@ -8,6 +26,7 @@ export function generateId(): string {
     return id;
 }
 
+
 export function convertArrayToSet(arr){
   let set = new Set();
   for(let i of arr){
@@ -15,6 +34,7 @@ export function convertArrayToSet(arr){
   }
   return set;
 }
+
 
 export function convertStringToDate(date: string){
   let month_date = {1:31, 2: 28 | 29, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31};

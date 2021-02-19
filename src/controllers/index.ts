@@ -1,4 +1,4 @@
-import {Request, Response} from "express"
+import {Request, Response, NextFunction} from "express"
 import {Service} from "../services/index"
 import {convertStringToDate} from "../utils/index"
 const service = new Service();
@@ -145,7 +145,7 @@ export class Controller{
         }
     }
 
-    postUser(req: Request, res: Response){
+    postUser(req: Request, res: Response, next: NextFunction){
         try{
             const admin_key: string = req.body.admin_key; 
             const name: string = req.body.name;        
@@ -158,7 +158,7 @@ export class Controller{
             if(admin.error) throw new Error(admin.error);
             
             const user: any = service.checkUserExist("name", name);
-            if(user.error) throw new Error(user.error);
+            if(user.user_id) throw new Error("User with this name already exist");
 
             let result: any;
             let user_info: any = {name: name};
@@ -173,9 +173,11 @@ export class Controller{
 
             result = service.addUser(user_info);
             if(result.error) throw new Error(result.error);
-
+            
+            res.setHeader("user_id", result.user_id);
+            res.setHeader("name", result.name);
             res.status(201);
-            res.send(result);
+            next();
         } catch(e){
             console.log(e.message);
             res.status(400);

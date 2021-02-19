@@ -1,6 +1,6 @@
-import express from "express";
-export declare class AppRoutes {
-    app: express.Application;
-    constructor(app: express.Application);
-    configureRoutes(): express.Application;
+import { Application } from "express";
+export declare class RoutesHandler {
+    app: Application;
+    constructor(app: Application);
+    configureRoutes(): Application;
 }
