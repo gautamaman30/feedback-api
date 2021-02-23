@@ -1,24 +1,42 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertStringToDate = exports.convertArrayToSet = exports.generateId = exports.readFile = void 0;
-const fs_1 = __importDefault(require("fs"));
-function readFile(file_path) {
-    return new Promise((resolve, reject) => {
-        fs_1.default.readFile(file_path, 'utf8', (err, file) => {
-            if (err) {
-                console.log(err);
-                reject(err);
-            }
-            else {
-                resolve(file);
-            }
-        });
-    });
-}
-exports.readFile = readFile;
+exports.convertStringToDate = exports.convertArrayToSet = exports.generateId = exports.Errors = exports.Messages = void 0;
+exports.Messages = {
+    FEEDBACK_UPDATED: "Feedback updated successfully",
+    FEEDBACK_DELETED: "Feedback deleted successfully",
+    FEEDBACK_CREATED: "Feedback created successfully",
+    TECHNOLOGY_DELETED: "Technology deleted successfully",
+    TECHNOLOGY_UPDATED: "Technology updated successfully",
+    TECHNOLOGY_CREATED: "Technology created successfully",
+    USER_DELETED: "User deleted successfully",
+    USER_CREATED: "User created successfully"
+};
+exports.Errors = {
+    ADMIN_KEY_REQUIRED: "Admin key is required",
+    ADMIN_POST_FEEDBACK: "Admin cannot give feedbacks",
+    ADMIN_EDIT_FEEDBACK: "Only users can edit their feedback",
+    ADMIN_DELETE_ADMIN: "Admin cannot delete another admin",
+    USER_NAME_REQUIRED: "User name is required",
+    USER_ID_REQUIRED: "User id is required",
+    USER_POST_OWN_FEEDBACK: "User cannot post feedbacks about themselves",
+    USER_EDIT_OTHERS_FEEDBACK: "User cannot update other user's feedbacks",
+    DUPLICATE_USER_NAME: "User with this name already exist",
+    USER_NOT_FOUND: "User not found",
+    TECHNOLOGY_NAME_REQUIRED: "Technology name is required",
+    TECHNOLOGY_DETAILS_REQUIRED: "Technology details is required",
+    TECHNOLOGY_NOT_FOUND: "Technology not found",
+    FEEDBACK_NAME_REQUIRED: "Feedback name is required",
+    FEEDBACK_ID_REQUIRED: "Feedback id is required",
+    FEEDBACK_REQUIRED: "Feedback is required",
+    FEEDBACK_STATUS_REQUIRED: "Feedback status is required",
+    FEEDBACK_STATUS_INCORRECT: "Feedback status can be 'approved' or 'rejected' only",
+    FEEDBACK_EMPTY: "Feedback cannot be empty",
+    FEEDBACK_NOT_FOUND: "Feedback not found",
+    NAME_NOT_FOUND: "Name not found",
+    DATE_FORMAT_INCORRECT: "Only accepted date format is 'YYYY-MM-DD'",
+    INTERNAL_ERROR: "Internal error",
+    AUTHORIZATION_FAILED: "Authorization failed"
+};
 function generateId() {
     const str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@";
     let id = '';
