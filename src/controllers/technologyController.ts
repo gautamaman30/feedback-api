@@ -47,13 +47,19 @@ export default class TechnologyController{
             }
 
             const admin: any = await userService.checkUserExist("admin_key", admin_key);
-            if(admin.error) { 
+            if(admin.error === Errors.INTERNAL_ERROR) { 
                 throw new Error(admin.error);
+            }
+            if(admin.error) { 
+                throw new Error(Errors.ADMIN_NOT_FOUND);
             }
             
             const technology: any = await technologyService.checkTechnologyExist("name", name);
-            if(technology.error) {
-                throw new Error(technology.error);
+            if(technology.error === Errors.INTERNAL_ERROR) { 
+                throw new Error(Errors.INTERNAL_ERROR);
+            }
+            if(technology.technology_id) { 
+                throw new Error(Errors.DUPLICATE_TECHNOLOGY);
             }
 
             let result: any;

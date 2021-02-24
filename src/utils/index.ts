@@ -20,6 +20,7 @@ export const Errors = {
   ADMIN_POST_FEEDBACK : "Admin cannot give feedbacks",
   ADMIN_EDIT_FEEDBACK : "Only users can edit their feedback",
   ADMIN_DELETE_ADMIN : "Admin cannot delete another admin", 
+  ADMIN_NOT_FOUND : "Admin not found",
   
 
   USER_NAME_REQUIRED : "User name is required",
@@ -32,6 +33,7 @@ export const Errors = {
   TECHNOLOGY_NAME_REQUIRED : "Technology name is required",
   TECHNOLOGY_DETAILS_REQUIRED : "Technology details is required",
   TECHNOLOGY_NOT_FOUND : "Technology not found",
+  DUPLICATE_TECHNOLOGY : "Technology with this name already exist",
 
   FEEDBACK_NAME_REQUIRED: "Feedback name is required",
   FEEDBACK_ID_REQUIRED : "Feedback id is required",

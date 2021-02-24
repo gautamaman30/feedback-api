@@ -17,7 +17,7 @@ class FeedbackController {
             try {
                 const admin_key = req.body.admin_key;
                 const feedback_id = req.query.feedback_id;
-                const filter = req.query.name;
+                const filter = req.query.filter;
                 const sort = req.query.sort;
                 let admin;
                 if (admin_key) {
@@ -35,10 +35,10 @@ class FeedbackController {
                 else if (filter || sort) {
                     if (filter) {
                         if (filter === "user") {
-                            feedbacks = index_1.feedbackService.filterFeedback(feedbacks, "user_id", []);
+                            feedbacks = index_1.feedbackService.filterFeedbackKeys(feedbacks, "user_id");
                         }
                         else if (filter === "technology") {
-                            feedbacks = index_1.feedbackService.filterFeedback(feedbacks, "technology_id", []);
+                            feedbacks = index_1.feedbackService.filterFeedbackKeys(feedbacks, "technology_id");
                         }
                         else if (filter === "status") {
                             feedbacks = index_1.feedbackService.filterFeedback(feedbacks, "status", ["approved"]);
@@ -137,7 +137,7 @@ class FeedbackController {
                     if (check_technology.error) {
                         throw new Error(index_2.Errors.NAME_NOT_FOUND);
                     }
-                    feedback_info.technology_id = check_user.check_technology;
+                    feedback_info.technology_id = check_technology.technology_id;
                 }
                 const result = yield index_1.feedbackService.addFeedback(feedback_info);
                 if (result.error) {
@@ -210,8 +210,11 @@ class FeedbackController {
                     throw new Error(index_2.Errors.FEEDBACK_STATUS_INCORRECT);
                 }
                 const admin = yield index_1.userService.checkUserExist("admin_key", admin_key);
-                if (admin.error) {
+                if (admin.error === index_2.Errors.INTERNAL_ERROR) {
                     throw new Error(admin.error);
+                }
+                if (admin.error) {
+                    throw new Error(index_2.Errors.ADMIN_NOT_FOUND);
                 }
                 const feedback = yield index_1.feedbackService.editFeedbackStatus({ feedback_id, status });
                 if (feedback.error) {
@@ -239,14 +242,17 @@ class FeedbackController {
                     throw new Error(index_2.Errors.FEEDBACK_ID_REQUIRED);
                 }
                 const admin = yield index_1.userService.checkUserExist("admin_key", admin_key);
-                if (admin.error) {
+                if (admin.error === index_2.Errors.INTERNAL_ERROR) {
                     throw new Error(admin.error);
+                }
+                if (admin.error) {
+                    throw new Error(index_2.Errors.ADMIN_NOT_FOUND);
                 }
                 const feedback = yield index_1.feedbackService.checkFeedbackExist("feedback_id", feedback_id);
                 if (feedback.error) {
                     throw new Error(feedback.error);
                 }
-                const result = index_1.feedbackService.removeFeedback({ feedback_id });
+                const result = yield index_1.feedbackService.removeFeedback({ feedback_id });
                 if (result.error)
                     throw new Error(result.error);
                 res.status(200);

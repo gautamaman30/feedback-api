@@ -8,7 +8,11 @@ const database = new Database();
 export default class UserService{
     async getAllUsers(){
         try{
-            const result = await database.findAll('users');
+            let result = await database.findAll('users');
+            if(result.error){
+                throw new Error(Errors.INTERNAL_ERROR);
+            }
+            result = result.filter(item => !item.admin_key);
             return result;
         } catch(err) {
             console.log(err);
@@ -36,16 +40,16 @@ export default class UserService{
     async checkUserExist(key: string, value: any){
 
         try{
-            let user_info: any;
+            let user_info: any = {};
             user_info[key] = value;
            
             const result = await database.findUser(user_info);
 
+            if(!result){
+                throw new Error(Errors.USER_NOT_FOUND);
+            }
             if(result.error){
                 throw new Error(Errors.INTERNAL_ERROR);
-            }
-            if(!result.user_id){
-                throw new Error(Errors.USER_NOT_FOUND);
             }
             return result;
         } catch(err) {
@@ -67,14 +71,14 @@ export default class UserService{
             if(user_info.email) user.email = user_info.email;
             if(user_info.title) user.title = user_info.title;
             if(user_info.date_of_birth) user.date_of_birth = user_info.date_of_birth;
-           
+            
             const result = await database.insertUser(user);
 
             if(result.error || result.insertedCount < 1){
                 throw new Error(Errors.INTERNAL_ERROR);
             }
 
-            return {message: Messages.USER_CREATED};
+            return user;
         } catch(err) {
             console.log(err);
             return {error: err.message};

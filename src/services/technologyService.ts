@@ -11,6 +11,9 @@ export default class TechnologyService{
     async getAllTechnologies(){
         try{
             const result = await database.findAll('technologies');
+            if(result.error){
+                throw new Error(Errors.INTERNAL_ERROR);
+            }
             return result;
         } catch(err) {
             console.log(err);
@@ -60,16 +63,16 @@ export default class TechnologyService{
 
     async checkTechnologyExist(key: string, value: any){
         try{
-            let technology_info: any;
+            let technology_info: any = {};
             technology_info[key] = value;
            
             const result = await database.findTechnology(technology_info);
 
+            if(!result){
+                throw new Error(Errors.TECHNOLOGY_NOT_FOUND);
+            }
             if(result.error){
                 throw new Error(Errors.INTERNAL_ERROR);
-            }
-            if(!result.technology_id){
-                throw new Error(Errors.TECHNOLOGY_NOT_FOUND);
             }
             return result;
         } catch(err) {

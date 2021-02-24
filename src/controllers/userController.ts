@@ -46,11 +46,17 @@ export default class UserController{
             } 
 
             const admin: any = await userService.checkUserExist("admin_key", admin_key);           
-            if(admin.error) {
+            if(admin.error === Errors.INTERNAL_ERROR) {
                 throw new Error(admin.error);
+            }
+            if(admin.error) {
+                throw new Error(Errors.ADMIN_NOT_FOUND);
             }
 
             const user: any = await userService.checkUserExist("name", name);
+            if(user.error === Errors.INTERNAL_ERROR) { 
+                throw new Error(Errors.INTERNAL_ERROR);
+            }
             if(user.user_id) { 
                 throw new Error(Errors.DUPLICATE_USER_NAME);
             }
@@ -105,7 +111,7 @@ export default class UserController{
                 throw new Error(admin.error);
             }
 
-            const user: any = await userService.checkUserExist("name", user_id);
+            const user: any = await userService.checkUserExist("user_id", user_id);
             if(user.error) {
                 throw new Error(user.error);
             }

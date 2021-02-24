@@ -55,10 +55,16 @@ class UserController {
                     throw new Error(index_2.Errors.USER_NAME_REQUIRED);
                 }
                 const admin = yield index_1.userService.checkUserExist("admin_key", admin_key);
-                if (admin.error) {
+                if (admin.error === index_2.Errors.INTERNAL_ERROR) {
                     throw new Error(admin.error);
                 }
+                if (admin.error) {
+                    throw new Error(index_2.Errors.ADMIN_NOT_FOUND);
+                }
                 const user = yield index_1.userService.checkUserExist("name", name);
+                if (user.error === index_2.Errors.INTERNAL_ERROR) {
+                    throw new Error(index_2.Errors.INTERNAL_ERROR);
+                }
                 if (user.user_id) {
                     throw new Error(index_2.Errors.DUPLICATE_USER_NAME);
                 }
@@ -106,7 +112,7 @@ class UserController {
                 if (admin.error) {
                     throw new Error(admin.error);
                 }
-                const user = yield index_1.userService.checkUserExist("name", user_id);
+                const user = yield index_1.userService.checkUserExist("user_id", user_id);
                 if (user.error) {
                     throw new Error(user.error);
                 }

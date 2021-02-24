@@ -16,7 +16,10 @@ class FeedbackService {
     getAllFeedbacks() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield database.findAll('feedbacks');
+                let result = yield database.findAll('feedbacks');
+                if (result.error) {
+                    throw new Error(index_2.Errors.INTERNAL_ERROR);
+                }
                 return result;
             }
             catch (err) {
@@ -82,14 +85,14 @@ class FeedbackService {
     checkFeedbackExist(key, value) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let feedback_info;
+                let feedback_info = {};
                 feedback_info[key] = value;
                 const result = yield database.findFeedback(feedback_info);
+                if (!result) {
+                    throw new Error(index_2.Errors.FEEDBACK_NOT_FOUND);
+                }
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
-                }
-                if (!result.feedback_id) {
-                    throw new Error(index_2.Errors.FEEDBACK_NOT_FOUND);
                 }
                 return result;
             }
@@ -127,7 +130,7 @@ class FeedbackService {
                         count: 0
                     };
                 }
-                const result = yield database.insertTechnology(new_feedback);
+                const result = yield database.insertFeedback(new_feedback);
                 if (result.error || result.insertedCount < 1) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }
@@ -139,12 +142,15 @@ class FeedbackService {
             }
         });
     }
+    filterFeedbackKeys(feedback_array, key) {
+        return feedback_array.filter((item) => item[key]);
+    }
     filterFeedback(feedback_array, key, values) {
         let set = index_2.convertArrayToSet(values);
         return feedback_array.filter((item) => item[key] && set.has(item[key]) ? true : false);
     }
     sortFeedback(feedback_array, key) {
-        return feedback_array.sort((a, b) => {
+        feedback_array.sort(function (a, b) {
             if (key === "created_on") {
                 return b.created_on.getMilliseconds() - a.created_on.getMilliseconds();
             }
@@ -153,6 +159,8 @@ class FeedbackService {
             }
             return 0;
         });
+        console.log(typeof feedback_array[0].created_on);
+        return feedback_array;
     }
 }
 exports.default = FeedbackService;

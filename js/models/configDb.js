@@ -19,7 +19,6 @@ class ConnectDb {
             }
             return this.client.db(this.db_name);
         });
-        console.log(process.env.DB_URL);
         this.url = process.env.DB_URL;
         this.db_name = process.env.DB_NAME;
         this.client = new mongodb_1.MongoClient(this.url, { useNewUrlParser: true, useUnifiedTopology: true });

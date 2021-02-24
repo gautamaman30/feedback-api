@@ -2,49 +2,13 @@ import { ConnectDb } from "./configDb"
 const getDb = new ConnectDb().getDb;
 
 
-type status = 'rejected' | 'approved' | 'waiting';
-
-export interface User{
-    user_id: string;
-    name: string;
-    admin_key?: string;
-    email?: string;
-    title?: string; 
-    date_of_birth?: Date;
-}
-
-export interface Technology{
-    technology_id: string;
-    name: string;
-    details?: string;
-}
-
-export interface Feedback{
-    feedback_id: string;
-    name: string;
-    feedback: string;
-    posted_by: string;
-    status: status;
-    user_id?: string;
-    technology_id?: string;
-    created_on: Date;
-    count: number; 
-}
-
-export interface Count{
-    feedback_id: string,
-    user_counted_feedback: string[]
-}
-
-
 export class Database{
     
     async findAll(collectionName: string){
         try{
             const db = await getDb();
-            const result = await db.collection(`${collectionName}`).find();
-            
-            return (await result.toArray());
+            const result = await db.collection(`${collectionName}`).find({}).toArray();
+            return result;
         } catch(e){
             console.log(e);
             return {error: e.message};

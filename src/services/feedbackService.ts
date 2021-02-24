@@ -9,6 +9,9 @@ export default class FeedbackService{
     async getAllFeedbacks(){
         try{
             const result = await database.findAll('feedbacks');
+            if(result.error){
+                throw new Error(Errors.INTERNAL_ERROR);
+            }
             return result;
         } catch(err) {
             console.log(err);
@@ -71,16 +74,15 @@ export default class FeedbackService{
 
     async checkFeedbackExist(key: string, value: any){
         try{
-            let feedback_info: any;
+            let feedback_info: any = {};
             feedback_info[key] = value;
            
             const result = await database.findFeedback(feedback_info);
-
+            if(!result){
+                throw new Error(Errors.FEEDBACK_NOT_FOUND);
+            }
             if(result.error){
                 throw new Error(Errors.INTERNAL_ERROR);
-            }
-            if(!result.feedback_id){
-                throw new Error(Errors.FEEDBACK_NOT_FOUND);
             }
             return result;
         } catch(err) {
@@ -118,7 +120,7 @@ export default class FeedbackService{
                 }
             }    
 
-            const result = await database.insertTechnology(new_feedback);
+            const result = await database.insertFeedback(new_feedback);
 
             if(result.error || result.insertedCount < 1){
                 throw new Error(Errors.INTERNAL_ERROR);
@@ -131,20 +133,25 @@ export default class FeedbackService{
         } 
     }
 
-    filterFeedback(feedback_array: Array<any>, key: string, values: string[]){
+    filterFeedbackKeys(feedback_array: Array<any>, key: string){
+        return feedback_array.filter((item) => item[key]);
+    }
+
+    filterFeedback(feedback_array: Array<any>, key: string, values: string[]) {
         let set = convertArrayToSet(values);
         return feedback_array.filter((item) => item[key] && set.has(item[key])? true: false);
     }
 
     sortFeedback(feedback_array: Array<any>, key: string){
-        return feedback_array.sort((a , b) => {
-            if(key === "created_on"){
-                return b.created_on.getMilliseconds() - a.created_on.getMilliseconds();  
+        feedback_array.sort(function(a, b){
+            if(key === "created_on") {
+                return b.created_on.getMilliseconds() - a.created_on.getMilliseconds(); 
             } 
-            if(key === "count"){
+            if(key === "count") {
                 return b.count - a.count;
             } 
             return 0;
         });
+        return feedback_array;
     }
 }

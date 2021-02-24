@@ -13,6 +13,7 @@ export declare const Errors: {
     ADMIN_POST_FEEDBACK: string;
     ADMIN_EDIT_FEEDBACK: string;
     ADMIN_DELETE_ADMIN: string;
+    ADMIN_NOT_FOUND: string;
     USER_NAME_REQUIRED: string;
     USER_ID_REQUIRED: string;
     USER_POST_OWN_FEEDBACK: string;
@@ -22,6 +23,7 @@ export declare const Errors: {
     TECHNOLOGY_NAME_REQUIRED: string;
     TECHNOLOGY_DETAILS_REQUIRED: string;
     TECHNOLOGY_NOT_FOUND: string;
+    DUPLICATE_TECHNOLOGY: string;
     FEEDBACK_NAME_REQUIRED: string;
     FEEDBACK_ID_REQUIRED: string;
     FEEDBACK_REQUIRED: string;

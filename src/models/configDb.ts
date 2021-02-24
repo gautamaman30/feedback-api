@@ -7,7 +7,6 @@ export class ConnectDb{
     private client: any;
 
     constructor(){
-        console.log(process.env.DB_URL);
         this.url = process.env.DB_URL;
         this.db_name = process.env.DB_NAME;
         this.client = new MongoClient(this.url, { useNewUrlParser: true, useUnifiedTopology: true });        

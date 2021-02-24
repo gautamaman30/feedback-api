@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc && node ./js/index.js",
+    "dev": "tsc && node -r dotenv/config ./js/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Aman Gautam",

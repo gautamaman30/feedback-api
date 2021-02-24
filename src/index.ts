@@ -1,11 +1,6 @@
 import express from "express"
 import http from "http"
-import path from "path"
 import {RoutesHandler} from "./routes/index"
-import {config} from "dotenv"
-
-
-config({path: path.join(process.cwd(),'/.env')});
 
 
 const app: express.Application = express();

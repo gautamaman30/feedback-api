@@ -12,9 +12,13 @@ export class Middleware{
             expiresIn: process.env.JWT_TOKEN_EXPIRES_IN,
             algorithm: process.env.JWT_TOKEN_ALGORITHM
         }
-
-
-        jwt.sign({ user_id: res.get("user_id")}, <Secret>process.env.SECRET_KEY, signOptions , function(err, result) {
+        let obj: any = {
+            user_id: res.get("user_id"),
+            name: res.get("name")
+        }
+        const key: any = process.env.SECRET_KEY;
+        
+        jwt.sign(obj, <Secret>key , signOptions , function(err, result) {
             if(err){
                 console.log(err);
                 res.status(500);
@@ -22,11 +26,7 @@ export class Middleware{
             }
             if(result){
                 console.log(result);
-                const obj: any = {
-                    user_id: res.get("user_id"),
-                    name: res.get("name"),
-                    token: result
-                }
+                obj.token = result;
                 res.send(obj);
             }
         });

@@ -17,8 +17,8 @@ class Database {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const db = yield getDb();
-                const result = yield db.collection(`${collectionName}`).find();
-                return (yield result.toArray());
+                const result = yield db.collection(`${collectionName}`).find({}).toArray();
+                return result;
             }
             catch (e) {
                 console.log(e);

@@ -55,12 +55,18 @@ class TechnologyController {
                     throw new Error(index_2.Errors.TECHNOLOGY_NAME_REQUIRED);
                 }
                 const admin = yield index_1.userService.checkUserExist("admin_key", admin_key);
-                if (admin.error) {
+                if (admin.error === index_2.Errors.INTERNAL_ERROR) {
                     throw new Error(admin.error);
                 }
+                if (admin.error) {
+                    throw new Error(index_2.Errors.ADMIN_NOT_FOUND);
+                }
                 const technology = yield index_1.technologyService.checkTechnologyExist("name", name);
-                if (technology.error) {
-                    throw new Error(technology.error);
+                if (technology.error === index_2.Errors.INTERNAL_ERROR) {
+                    throw new Error(index_2.Errors.INTERNAL_ERROR);
+                }
+                if (technology.technology_id) {
+                    throw new Error(index_2.Errors.DUPLICATE_TECHNOLOGY);
                 }
                 let result;
                 if (req.body.details) {

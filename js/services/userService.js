@@ -16,7 +16,11 @@ class UserService {
     getAllUsers() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield database.findAll('users');
+                let result = yield database.findAll('users');
+                if (result.error) {
+                    throw new Error(index_2.Errors.INTERNAL_ERROR);
+                }
+                result = result.filter(item => !item.admin_key);
                 return result;
             }
             catch (err) {
@@ -46,14 +50,14 @@ class UserService {
     checkUserExist(key, value) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let user_info;
+                let user_info = {};
                 user_info[key] = value;
                 const result = yield database.findUser(user_info);
+                if (!result) {
+                    throw new Error(index_2.Errors.USER_NOT_FOUND);
+                }
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
-                }
-                if (!result.user_id) {
-                    throw new Error(index_2.Errors.USER_NOT_FOUND);
                 }
                 return result;
             }
@@ -81,7 +85,7 @@ class UserService {
                 if (result.error || result.insertedCount < 1) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }
-                return { message: index_2.Messages.USER_CREATED };
+                return user;
             }
             catch (err) {
                 console.log(err);

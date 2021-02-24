@@ -15,11 +15,5 @@ export default class UserService {
         email?: string;
         title?: string;
         date_of_birth?: Date;
-    }): Promise<{
-        message: string;
-        error?: undefined;
-    } | {
-        error: any;
-        message?: undefined;
-    }>;
+    }): Promise<any>;
 }

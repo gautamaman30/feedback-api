@@ -8,7 +8,7 @@ export default class FeedbackController{
         try{
             const admin_key = req.body.admin_key;
             const feedback_id = req.query.feedback_id;
-            const filter = req.query.name;
+            const filter = req.query.filter;
             const sort = req.query.sort;
             
             let admin;
@@ -17,7 +17,7 @@ export default class FeedbackController{
                 if(admin.error) throw new Error(admin.error);
             } 
 
-            let feedbacks = await feedbackService.getAllFeedbacks();
+            let feedbacks: any = await feedbackService.getAllFeedbacks();
                 
             if(feedback_id){
                 const feedback: any = await feedbackService.checkFeedbackExist("feedback_id", feedback_id);
@@ -28,9 +28,9 @@ export default class FeedbackController{
             else if(filter || sort){
                 if(filter){
                     if(filter === "user"){
-                        feedbacks = feedbackService.filterFeedback(feedbacks, "user_id", []);
+                        feedbacks = feedbackService.filterFeedbackKeys(feedbacks, "user_id");
                     } else if(filter === "technology"){
-                        feedbacks = feedbackService.filterFeedback(feedbacks, "technology_id", []);
+                        feedbacks = feedbackService.filterFeedbackKeys(feedbacks, "technology_id");
                     } else if(filter === "status"){
                         feedbacks = feedbackService.filterFeedback(feedbacks, "status", ["approved"]);
                     }
@@ -135,7 +135,7 @@ export default class FeedbackController{
                 if(check_technology.error) { 
                     throw new Error(Errors.NAME_NOT_FOUND);
                 }    
-                feedback_info.technology_id = check_user.check_technology;
+                feedback_info.technology_id = check_technology.technology_id;
             }
             
             const result: any = await feedbackService.addFeedback(feedback_info);
@@ -217,8 +217,11 @@ export default class FeedbackController{
             }
 
             const admin: any = await userService.checkUserExist("admin_key", admin_key);
-            if(admin.error) {
+            if(admin.error === Errors.INTERNAL_ERROR){
                 throw new Error(admin.error); 
+            }
+            if(admin.error) {
+                throw new Error(Errors.ADMIN_NOT_FOUND); 
             }
 
             const feedback: any = await feedbackService.editFeedbackStatus({feedback_id, status});
@@ -249,8 +252,11 @@ export default class FeedbackController{
             }
 
             const admin: any = await userService.checkUserExist("admin_key", admin_key);
+            if(admin.error === Errors.INTERNAL_ERROR){
+                throw new Error(admin.error); 
+            }
             if(admin.error) {
-                throw new Error(admin.error);
+                throw new Error(Errors.ADMIN_NOT_FOUND); 
             }
 
             const feedback: any = await feedbackService.checkFeedbackExist("feedback_id", feedback_id);
@@ -258,9 +264,8 @@ export default class FeedbackController{
                 throw new Error(feedback.error);
             }
 
-            const result: any = feedbackService.removeFeedback({feedback_id});
+            const result: any = await feedbackService.removeFeedback({feedback_id});
             if(result.error) throw new Error(result.error);
-
             res.status(200);
             res.send(result);
         } catch(e){

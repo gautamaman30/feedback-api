@@ -43,6 +43,7 @@ export default class FeedbackService {
         error: any;
         message?: undefined;
     }>;
+    filterFeedbackKeys(feedback_array: Array<any>, key: string): any[];
     filterFeedback(feedback_array: Array<any>, key: string, values: string[]): any[];
     sortFeedback(feedback_array: Array<any>, key: string): any[];
 }

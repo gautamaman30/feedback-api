@@ -17,6 +17,9 @@ class TechnologyService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const result = yield database.findAll('technologies');
+                if (result.error) {
+                    throw new Error(index_2.Errors.INTERNAL_ERROR);
+                }
                 return result;
             }
             catch (err) {
@@ -64,14 +67,14 @@ class TechnologyService {
     checkTechnologyExist(key, value) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let technology_info;
+                let technology_info = {};
                 technology_info[key] = value;
                 const result = yield database.findTechnology(technology_info);
+                if (!result) {
+                    throw new Error(index_2.Errors.TECHNOLOGY_NOT_FOUND);
+                }
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
-                }
-                if (!result.technology_id) {
-                    throw new Error(index_2.Errors.TECHNOLOGY_NOT_FOUND);
                 }
                 return result;
             }
