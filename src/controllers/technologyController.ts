@@ -1,6 +1,7 @@
+import { load } from "dotenv/types";
 import {Request, Response } from "express"
 import {userService, technologyService } from "../services/index"
-import { Errors} from "../utils/index"
+import { lowerCaseStrings, Errors} from "../utils/index"
 
 
 export default class TechnologyController{
@@ -8,7 +9,7 @@ export default class TechnologyController{
     async getTechnology(req: Request, res: Response){
         try{
             const technology_id = req.query.technology_id;
-            const name = req.query.name;
+            const name: any = req.query.name;
 
             let result;
             
@@ -17,7 +18,7 @@ export default class TechnologyController{
                 if(result.error) throw new Error(result.error);       
             }
             else if(name){
-                result = await technologyService.checkTechnologyExist("name", name);
+                result = await technologyService.checkTechnologyExist("name", lowerCaseStrings(name));
                 if(result.error) throw new Error(result.error);
             } 
             else{
@@ -36,7 +37,7 @@ export default class TechnologyController{
     async postTechnology(req: Request, res: Response){
         try{
             const admin_key: string = req.body.admin_key; 
-            const name: string = req.body.name;
+            let name: string = req.body.name;
             
             if(!admin_key) { 
                 throw new Error(Errors.ADMIN_KEY_REQUIRED);
@@ -54,6 +55,8 @@ export default class TechnologyController{
                 throw new Error(Errors.ADMIN_NOT_FOUND);
             }
             
+            name = lowerCaseStrings(name);
+
             const technology: any = await technologyService.checkTechnologyExist("name", name);
             if(technology.error === Errors.INTERNAL_ERROR) { 
                 throw new Error(Errors.INTERNAL_ERROR);
@@ -84,31 +87,38 @@ export default class TechnologyController{
 
     async updateTechnology(req: Request, res: Response){
         try{
-            const admin_key: string = req.body.admin_key;         
+            const admin_key: string = req.body.admin_key;  
+            let name: string = req.body.name;
+            let details: string = req.body.details;       
 
             if(!admin_key) {
                 throw new Error(Errors.ADMIN_KEY_REQUIRED);
             }
 
-            if(!req.body.name) {
+            if(!name) {
                 throw new Error(Errors.TECHNOLOGY_NAME_REQUIRED);
             }
 
-            if(!req.body.details) {
+            if(!details) {
                 throw new Error(Errors.TECHNOLOGY_DETAILS_REQUIRED);
             }
 
             const admin: any = await userService.checkUserExist("admin_key", admin_key);
-            if(admin.error) {
-                throw new Error(admin.error);           
+            if(admin.error === Errors.INTERNAL_ERROR) { 
+                throw new Error(admin.error);
+            }
+            if(admin.error) { 
+                throw new Error(Errors.ADMIN_NOT_FOUND);
             }
 
-            const technology: any = await technologyService.checkTechnologyExist("name", req.body.name);
+            name = lowerCaseStrings(name);
+
+            const technology: any = await technologyService.checkTechnologyExist("name", name);
             if(technology.error) {
                 throw new Error(technology.error);
             }
 
-            const result: any = await technologyService.editTechnology(req.body);
+            const result: any = await technologyService.editTechnology({name, details});
             if(result.error) {
                 throw new Error(result.error);
             }
@@ -126,7 +136,7 @@ export default class TechnologyController{
         try{
 
             const admin_key: string = req.body.admin_key;
-            const name: string = req.body.name;         
+            let name: string = req.body.name;         
 
             if(!admin_key) {
                 throw new Error(Errors.ADMIN_KEY_REQUIRED);
@@ -137,9 +147,14 @@ export default class TechnologyController{
             }
 
             const admin: any = await userService.checkUserExist("admin_key", admin_key);
-            if(admin.error) {
+            if(admin.error === Errors.INTERNAL_ERROR) { 
                 throw new Error(admin.error);
             }
+            if(admin.error) { 
+                throw new Error(Errors.ADMIN_NOT_FOUND);
+            }
+
+            name = lowerCaseStrings(name);
 
             const technology: any = await technologyService.checkTechnologyExist("name", name);
             if(technology.error) {

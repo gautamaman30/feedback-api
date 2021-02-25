@@ -50,5 +50,12 @@ class Middleware {
             }
         });
     }
+    checkRequestKeys(req, res, next) {
+        let body = req.body;
+        for (let key in body) {
+            req.body[key.toLowerCase()] = body[key];
+        }
+        return next();
+    }
 }
 exports.Middleware = Middleware;

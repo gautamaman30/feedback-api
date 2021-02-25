@@ -103,8 +103,8 @@ class FeedbackController {
             try {
                 const admin_key = req.body.admin_key;
                 const user_id = req.body.user_id;
-                const name = req.body.name;
                 const feedback = req.body.feedback;
+                let name = req.body.name;
                 if (admin_key) {
                     throw new Error(index_2.Errors.ADMIN_POST_FEEDBACK);
                 }
@@ -124,6 +124,7 @@ class FeedbackController {
                 if (user.error) {
                     throw new Error(user.error);
                 }
+                name = index_2.lowerCaseStrings(name);
                 let feedback_info = { name: name, feedback: feedback, posted_by: user_id };
                 const check_user = yield index_1.userService.checkUserExist("name", name);
                 if (!(check_user.error)) {
@@ -196,7 +197,7 @@ class FeedbackController {
             try {
                 const admin_key = req.body.admin_key;
                 const feedback_id = req.body.feedback_id;
-                const status = req.body.status;
+                let status = req.body.status;
                 if (!admin_key) {
                     throw new Error(index_2.Errors.ADMIN_KEY_REQUIRED);
                 }
@@ -206,6 +207,7 @@ class FeedbackController {
                 if (!status) {
                     throw new Error(index_2.Errors.FEEDBACK_STATUS_REQUIRED);
                 }
+                status = index_2.lowerCaseStrings(status);
                 if (!(status === 'approved' || status === 'rejected')) {
                     throw new Error(index_2.Errors.FEEDBACK_STATUS_INCORRECT);
                 }
@@ -222,6 +224,44 @@ class FeedbackController {
                 }
                 res.status(200);
                 res.send(feedback);
+            }
+            catch (e) {
+                console.log(e.message);
+                res.status(400);
+                res.send({ error: e.message });
+            }
+        });
+    }
+    updateFeedbackCount(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const admin_key = req.body.admin_key;
+                const feedback_id = req.body.feedback_id;
+                let name = req.body.name;
+                if (admin_key) {
+                    throw new Error(index_2.Errors.ADMIN_EDIT_FEEDBACK);
+                }
+                if (!feedback_id) {
+                    throw new Error(index_2.Errors.FEEDBACK_ID_REQUIRED);
+                }
+                if (!name) {
+                    throw new Error(index_2.Errors.USER_NAME_REQUIRED);
+                }
+                name = index_2.lowerCaseStrings(name);
+                const feedback = yield index_1.feedbackService.checkFeedbackExist("feedback_id", feedback_id);
+                if (feedback.error)
+                    throw new Error(feedback.error);
+                for (let i of feedback.count_users) {
+                    if (i === name) {
+                        throw new Error(index_2.Errors.FEEDBACK_USER_COUNT_EXIST);
+                    }
+                }
+                const result = yield index_1.feedbackService.editFeedbackCount({ feedback_id, count_users: name });
+                if (feedback.error) {
+                    throw new Error(feedback.error);
+                }
+                res.status(200);
+                res.send(result);
             }
             catch (e) {
                 console.log(e.message);

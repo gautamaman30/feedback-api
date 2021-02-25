@@ -17,11 +17,8 @@ export class Database{
 
     async updateFeedback(filter, update){
         try{
-            const updateDoc = {
-                $set: update
-            }
             const db = await getDb();
-            const result = await db.collection('feedbacks').updateOne(filter, updateDoc);
+            const result = await db.collection('feedbacks').updateOne(filter, update);
             return result;
         } catch(e){
             console.log(e);

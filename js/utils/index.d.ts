@@ -31,6 +31,7 @@ export declare const Errors: {
     FEEDBACK_STATUS_INCORRECT: string;
     FEEDBACK_EMPTY: string;
     FEEDBACK_NOT_FOUND: string;
+    FEEDBACK_USER_COUNT_EXIST: string;
     NAME_NOT_FOUND: string;
     DATE_FORMAT_INCORRECT: string;
     INTERNAL_ERROR: string;
@@ -38,4 +39,5 @@ export declare const Errors: {
 };
 export declare function generateId(): string;
 export declare function convertArrayToSet(arr: any): Set<unknown>;
+export declare function lowerCaseStrings(item: string): string;
 export declare function convertStringToDate(date: string): Date | null;

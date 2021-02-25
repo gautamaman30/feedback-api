@@ -5,5 +5,6 @@ export default class FeedbackController {
     postFeedback(req: Request, res: Response): Promise<void>;
     updateFeedback(req: Request, res: Response): Promise<void>;
     updateFeedbackStatus(req: Request, res: Response): Promise<void>;
+    updateFeedbackCount(req: Request, res: Response): Promise<void>;
     deleteFeedback(req: Request, res: Response): Promise<void>;
 }

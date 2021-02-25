@@ -1,6 +1,7 @@
 import {Request, Response } from "express"
+import { stat } from "fs";
 import {userService, technologyService, feedbackService} from "../services/index"
-import { Errors} from "../utils/index"
+import {lowerCaseStrings, Errors} from "../utils/index"
 
 
 export default class FeedbackController{
@@ -89,12 +90,13 @@ export default class FeedbackController{
             res.send({error: e.message});
         }
     }
+
     async postFeedback(req: Request, res: Response){
         try{
             const admin_key: string = req.body.admin_key;         
             const user_id: string = req.body.user_id;         
-            const name: string = req.body.name;
             const feedback: string = req.body.feedback;
+            let name: string = req.body.name;
             
             if(admin_key){ 
                 throw new Error(Errors.ADMIN_POST_FEEDBACK);
@@ -121,9 +123,12 @@ export default class FeedbackController{
                 throw new Error(user.error);
             }
 
+            name = lowerCaseStrings(name);
+
             let feedback_info: any = {name: name, feedback: feedback, posted_by: user_id};
 
             const check_user: any = await userService.checkUserExist("name", name);
+            
             if(!(check_user.error)) {
                 if(check_user.user_id === user_id) {
                     throw new Error(Errors.USER_POST_OWN_FEEDBACK)
@@ -198,7 +203,7 @@ export default class FeedbackController{
         try{
             const admin_key: string = req.body.admin_key;   
             const feedback_id: string = req.body.feedback_id;         
-            const status: string = req.body.status;         
+            let status: string = req.body.status;         
             
             if(!admin_key) {
                 throw new Error(Errors.ADMIN_KEY_REQUIRED);
@@ -212,6 +217,8 @@ export default class FeedbackController{
                 throw new Error(Errors.FEEDBACK_STATUS_REQUIRED);
             }
 
+            status = lowerCaseStrings(status);
+            
             if(!(status === 'approved' || status === 'rejected')) {
                 throw new Error(Errors.FEEDBACK_STATUS_INCORRECT);
             }
@@ -237,7 +244,48 @@ export default class FeedbackController{
         }
     }
 
-  
+    async updateFeedbackCount(req: Request, res: Response){
+        try{
+            const admin_key: string = req.body.admin_key;   
+            const feedback_id: string = req.body.feedback_id;         
+            let name: string = req.body.name;         
+            
+            if(admin_key) {
+                throw new Error(Errors.ADMIN_EDIT_FEEDBACK);
+            }
+
+            if(!feedback_id) {
+                throw new Error(Errors.FEEDBACK_ID_REQUIRED);
+            }
+            
+            if(!name) {
+                throw new Error(Errors.USER_NAME_REQUIRED);
+            }
+            
+            name = lowerCaseStrings(name);
+
+            const feedback: any = await feedbackService.checkFeedbackExist("feedback_id", feedback_id);
+            if(feedback.error) throw new Error(feedback.error);
+
+            for(let i of feedback.count_users){
+                if(i === name){
+                    throw new Error(Errors.FEEDBACK_USER_COUNT_EXIST);
+                }
+            }
+            
+            const result: any = await feedbackService.editFeedbackCount({feedback_id, count_users: name});
+            if(feedback.error) {
+                throw new Error(feedback.error);
+            }    
+            res.status(200);
+            res.send(result);
+        } catch(e){
+            console.log(e.message);
+            res.status(400);
+            res.send({error: e.message});
+        }
+    }
+
     async deleteFeedback(req: Request, res: Response){
         try{
             const admin_key: string = req.body.admin_key;         

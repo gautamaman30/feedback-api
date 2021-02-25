@@ -16,7 +16,7 @@ class FeedbackService {
     getAllFeedbacks() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let result = yield database.findAll('feedbacks');
+                const result = yield database.findAll('feedbacks');
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }
@@ -31,7 +31,25 @@ class FeedbackService {
     editFeedbackStatus(feedback_info) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield database.updateFeedback({ feedback_id: feedback_info.feedback_id }, { status: feedback_info.status });
+                const result = yield database.updateFeedback({ feedback_id: feedback_info.feedback_id }, { $set: { status: feedback_info.status } });
+                if (result.error) {
+                    throw new Error(index_2.Errors.INTERNAL_ERROR);
+                }
+                if (result.matchedCount < 1) {
+                    throw new Error(index_2.Errors.FEEDBACK_NOT_FOUND);
+                }
+                return { message: index_2.Messages.FEEDBACK_UPDATED };
+            }
+            catch (err) {
+                console.log(err);
+                return { error: err.message };
+            }
+        });
+    }
+    editFeedbackCount(feedback_info) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield database.updateFeedback({ feedback_id: feedback_info.feedback_id }, { $push: { count_users: feedback_info.count_users }, $inc: { count: 1 } });
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }
@@ -49,7 +67,7 @@ class FeedbackService {
     editFeedback(feedback_info) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield database.updateFeedback({ feedback_id: feedback_info.feedback_id }, { feedback: feedback_info.feedback });
+                const result = yield database.updateFeedback({ feedback_id: feedback_info.feedback_id }, { $set: { feedback: feedback_info.feedback } });
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }
@@ -159,7 +177,6 @@ class FeedbackService {
             }
             return 0;
         });
-        console.log(typeof feedback_array[0].created_on);
         return feedback_array;
     }
 }

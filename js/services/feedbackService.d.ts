@@ -10,6 +10,16 @@ export default class FeedbackService {
         error: any;
         message?: undefined;
     }>;
+    editFeedbackCount(feedback_info: {
+        feedback_id: string;
+        count_users: string;
+    }): Promise<{
+        message: string;
+        error?: undefined;
+    } | {
+        error: any;
+        message?: undefined;
+    }>;
     editFeedback(feedback_info: {
         feedback_id: string;
         feedback: string;

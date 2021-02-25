@@ -1,6 +1,6 @@
 import {Request, Response, NextFunction} from "express"
 import { userService } from "../services/index"
-import {convertStringToDate, Errors} from "../utils/index"
+import {lowerCaseStrings, convertStringToDate, Errors} from "../utils/index"
 
 
 export default class UserController{
@@ -8,15 +8,15 @@ export default class UserController{
     async getUser(req: Request, res: Response){
         try{
             const user_id = req.query.user_id;
-            const name = req.query.name;
+            const name: any = req.query.name;
             
             let result;
             if(user_id){
                 result = await userService.checkUserExist("user_id", user_id);
                 if(result.error) throw new Error(result.error);       
             }
-            else if(name){
-                result = await userService.checkUserExist("name", name);
+            else if(name){ 
+                result = await userService.checkUserExist("name", lowerCaseStrings(name));
                 if(result.error) throw new Error(result.error);
             } 
             else{
@@ -35,8 +35,8 @@ export default class UserController{
     async postUser(req: Request, res: Response, next: NextFunction){
         try{
             const admin_key: string = req.body.admin_key; 
-            const name: string = req.body.name;        
-
+            let name: string = req.body.name;   
+            
             if(!admin_key) {
                 throw new Error(Errors.ADMIN_KEY_REQUIRED);
             }
@@ -52,6 +52,8 @@ export default class UserController{
             if(admin.error) {
                 throw new Error(Errors.ADMIN_NOT_FOUND);
             }
+
+            name = lowerCaseStrings(name);    
 
             const user: any = await userService.checkUserExist("name", name);
             if(user.error === Errors.INTERNAL_ERROR) { 

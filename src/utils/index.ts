@@ -27,13 +27,13 @@ export const Errors = {
   USER_ID_REQUIRED : "User id is required",
   USER_POST_OWN_FEEDBACK : "User cannot post feedbacks about themselves",
   USER_EDIT_OTHERS_FEEDBACK : "User cannot update other user's feedbacks",
-  DUPLICATE_USER_NAME : "User with this name already exist",
+  DUPLICATE_USER_NAME : "User with this name already exists",
   USER_NOT_FOUND : "User not found",
 
   TECHNOLOGY_NAME_REQUIRED : "Technology name is required",
   TECHNOLOGY_DETAILS_REQUIRED : "Technology details is required",
   TECHNOLOGY_NOT_FOUND : "Technology not found",
-  DUPLICATE_TECHNOLOGY : "Technology with this name already exist",
+  DUPLICATE_TECHNOLOGY : "Technology with this name already exists",
 
   FEEDBACK_NAME_REQUIRED: "Feedback name is required",
   FEEDBACK_ID_REQUIRED : "Feedback id is required",
@@ -42,7 +42,8 @@ export const Errors = {
   FEEDBACK_STATUS_INCORRECT : "Feedback status can be 'approved' or 'rejected' only",
   FEEDBACK_EMPTY: "Feedback cannot be empty",
   FEEDBACK_NOT_FOUND : "Feedback not found",
-  
+  FEEDBACK_USER_COUNT_EXIST : "Count with this name already exists",
+    
   NAME_NOT_FOUND: "Name not found",
   DATE_FORMAT_INCORRECT: "Only accepted date format is 'YYYY-MM-DD'",
   INTERNAL_ERROR : "Internal error",
@@ -68,6 +69,11 @@ export function convertArrayToSet(arr){
   }
   return set;
 }
+
+
+export function lowerCaseStrings(item: string){
+  return item.toLocaleLowerCase();
+} 
 
 
 export function convertStringToDate(date: string){

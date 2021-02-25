@@ -9,25 +9,27 @@ class RoutesHandler {
         this.app = app;
     }
     configureRoutes() {
+        this.app.use('/', middleware.checkRequestKeys, middleware.verifyToken);
         //User routes
         this.app.route('/api/v1/user')
-            .get(middleware.verifyToken, index_2.userController.getUser)
-            .post(middleware.verifyToken, index_2.userController.postUser, middleware.signToken)
-            .delete(middleware.verifyToken, index_2.userController.deleteUser);
+            .get(index_2.userController.getUser)
+            .post(index_2.userController.postUser, middleware.signToken)
+            .delete(index_2.userController.deleteUser);
         //Technology routes
         this.app.route('/api/v1/technology')
-            .get(middleware.verifyToken, index_2.technologyController.getTechnology)
-            .post(middleware.verifyToken, index_2.technologyController.postTechnology)
-            .delete(middleware.verifyToken, index_2.technologyController.deleteTechnology)
-            .put(middleware.verifyToken, index_2.technologyController.updateTechnology);
+            .get(index_2.technologyController.getTechnology)
+            .post(index_2.technologyController.postTechnology)
+            .delete(index_2.technologyController.deleteTechnology)
+            .put(index_2.technologyController.updateTechnology);
         //Feedback routes
         this.app.route('/api/v1/feedback')
-            .get(middleware.verifyToken, index_2.feedbackController.getFeedbacks)
-            .post(middleware.verifyToken, index_2.feedbackController.postFeedback)
-            .delete(middleware.verifyToken, index_2.feedbackController.deleteFeedback)
-            .put(middleware.verifyToken, index_2.feedbackController.updateFeedback);
-        this.app.put('/api/v1/feedback/status', middleware.verifyToken, index_2.feedbackController.updateFeedbackStatus);
-        this.app.get('/api/v1/user/feedbacks', middleware.verifyToken, index_2.feedbackController.getFeedbacksByUser);
+            .get(index_2.feedbackController.getFeedbacks)
+            .post(index_2.feedbackController.postFeedback)
+            .delete(index_2.feedbackController.deleteFeedback)
+            .put(index_2.feedbackController.updateFeedback);
+        this.app.put('/api/v1/feedback/status', index_2.feedbackController.updateFeedbackStatus);
+        this.app.put('/api/v1/feedback/count', index_2.feedbackController.updateFeedbackCount);
+        this.app.get('/api/v1/user/feedbacks', index_2.feedbackController.getFeedbacksByUser);
         return this.app;
     }
 }

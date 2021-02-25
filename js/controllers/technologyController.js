@@ -24,7 +24,7 @@ class TechnologyController {
                         throw new Error(result.error);
                 }
                 else if (name) {
-                    result = yield index_1.technologyService.checkTechnologyExist("name", name);
+                    result = yield index_1.technologyService.checkTechnologyExist("name", index_2.lowerCaseStrings(name));
                     if (result.error)
                         throw new Error(result.error);
                 }
@@ -47,7 +47,7 @@ class TechnologyController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const admin_key = req.body.admin_key;
-                const name = req.body.name;
+                let name = req.body.name;
                 if (!admin_key) {
                     throw new Error(index_2.Errors.ADMIN_KEY_REQUIRED);
                 }
@@ -61,6 +61,7 @@ class TechnologyController {
                 if (admin.error) {
                     throw new Error(index_2.Errors.ADMIN_NOT_FOUND);
                 }
+                name = index_2.lowerCaseStrings(name);
                 const technology = yield index_1.technologyService.checkTechnologyExist("name", name);
                 if (technology.error === index_2.Errors.INTERNAL_ERROR) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
@@ -93,24 +94,30 @@ class TechnologyController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const admin_key = req.body.admin_key;
+                let name = req.body.name;
+                let details = req.body.details;
                 if (!admin_key) {
                     throw new Error(index_2.Errors.ADMIN_KEY_REQUIRED);
                 }
-                if (!req.body.name) {
+                if (!name) {
                     throw new Error(index_2.Errors.TECHNOLOGY_NAME_REQUIRED);
                 }
-                if (!req.body.details) {
+                if (!details) {
                     throw new Error(index_2.Errors.TECHNOLOGY_DETAILS_REQUIRED);
                 }
                 const admin = yield index_1.userService.checkUserExist("admin_key", admin_key);
-                if (admin.error) {
+                if (admin.error === index_2.Errors.INTERNAL_ERROR) {
                     throw new Error(admin.error);
                 }
-                const technology = yield index_1.technologyService.checkTechnologyExist("name", req.body.name);
+                if (admin.error) {
+                    throw new Error(index_2.Errors.ADMIN_NOT_FOUND);
+                }
+                name = index_2.lowerCaseStrings(name);
+                const technology = yield index_1.technologyService.checkTechnologyExist("name", name);
                 if (technology.error) {
                     throw new Error(technology.error);
                 }
-                const result = yield index_1.technologyService.editTechnology(req.body);
+                const result = yield index_1.technologyService.editTechnology({ name, details });
                 if (result.error) {
                     throw new Error(result.error);
                 }
@@ -128,7 +135,7 @@ class TechnologyController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const admin_key = req.body.admin_key;
-                const name = req.body.name;
+                let name = req.body.name;
                 if (!admin_key) {
                     throw new Error(index_2.Errors.ADMIN_KEY_REQUIRED);
                 }
@@ -136,9 +143,13 @@ class TechnologyController {
                     throw new Error(index_2.Errors.TECHNOLOGY_NAME_REQUIRED);
                 }
                 const admin = yield index_1.userService.checkUserExist("admin_key", admin_key);
-                if (admin.error) {
+                if (admin.error === index_2.Errors.INTERNAL_ERROR) {
                     throw new Error(admin.error);
                 }
+                if (admin.error) {
+                    throw new Error(index_2.Errors.ADMIN_NOT_FOUND);
+                }
+                name = index_2.lowerCaseStrings(name);
                 const technology = yield index_1.technologyService.checkTechnologyExist("name", name);
                 if (technology.error) {
                     throw new Error(technology.error);

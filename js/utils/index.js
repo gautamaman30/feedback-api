@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertStringToDate = exports.convertArrayToSet = exports.generateId = exports.Errors = exports.Messages = void 0;
+exports.convertStringToDate = exports.lowerCaseStrings = exports.convertArrayToSet = exports.generateId = exports.Errors = exports.Messages = void 0;
 exports.Messages = {
     FEEDBACK_UPDATED: "Feedback updated successfully",
     FEEDBACK_DELETED: "Feedback deleted successfully",
@@ -21,12 +21,12 @@ exports.Errors = {
     USER_ID_REQUIRED: "User id is required",
     USER_POST_OWN_FEEDBACK: "User cannot post feedbacks about themselves",
     USER_EDIT_OTHERS_FEEDBACK: "User cannot update other user's feedbacks",
-    DUPLICATE_USER_NAME: "User with this name already exist",
+    DUPLICATE_USER_NAME: "User with this name already exists",
     USER_NOT_FOUND: "User not found",
     TECHNOLOGY_NAME_REQUIRED: "Technology name is required",
     TECHNOLOGY_DETAILS_REQUIRED: "Technology details is required",
     TECHNOLOGY_NOT_FOUND: "Technology not found",
-    DUPLICATE_TECHNOLOGY: "Technology with this name already exist",
+    DUPLICATE_TECHNOLOGY: "Technology with this name already exists",
     FEEDBACK_NAME_REQUIRED: "Feedback name is required",
     FEEDBACK_ID_REQUIRED: "Feedback id is required",
     FEEDBACK_REQUIRED: "Feedback is required",
@@ -34,6 +34,7 @@ exports.Errors = {
     FEEDBACK_STATUS_INCORRECT: "Feedback status can be 'approved' or 'rejected' only",
     FEEDBACK_EMPTY: "Feedback cannot be empty",
     FEEDBACK_NOT_FOUND: "Feedback not found",
+    FEEDBACK_USER_COUNT_EXIST: "Count with this name already exists",
     NAME_NOT_FOUND: "Name not found",
     DATE_FORMAT_INCORRECT: "Only accepted date format is 'YYYY-MM-DD'",
     INTERNAL_ERROR: "Internal error",
@@ -57,6 +58,10 @@ function convertArrayToSet(arr) {
     return set;
 }
 exports.convertArrayToSet = convertArrayToSet;
+function lowerCaseStrings(item) {
+    return item.toLocaleLowerCase();
+}
+exports.lowerCaseStrings = lowerCaseStrings;
 function convertStringToDate(date) {
     let month_date = { 1: 31, 2: 28 | 29, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30, 10: 31, 11: 30, 12: 31 };
     let arr = date.split('-');

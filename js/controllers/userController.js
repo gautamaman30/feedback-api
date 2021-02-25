@@ -24,7 +24,7 @@ class UserController {
                         throw new Error(result.error);
                 }
                 else if (name) {
-                    result = yield index_1.userService.checkUserExist("name", name);
+                    result = yield index_1.userService.checkUserExist("name", index_2.lowerCaseStrings(name));
                     if (result.error)
                         throw new Error(result.error);
                 }
@@ -47,7 +47,7 @@ class UserController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const admin_key = req.body.admin_key;
-                const name = req.body.name;
+                let name = req.body.name;
                 if (!admin_key) {
                     throw new Error(index_2.Errors.ADMIN_KEY_REQUIRED);
                 }
@@ -61,6 +61,7 @@ class UserController {
                 if (admin.error) {
                     throw new Error(index_2.Errors.ADMIN_NOT_FOUND);
                 }
+                name = index_2.lowerCaseStrings(name);
                 const user = yield index_1.userService.checkUserExist("name", name);
                 if (user.error === index_2.Errors.INTERNAL_ERROR) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);

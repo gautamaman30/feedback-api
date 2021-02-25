@@ -29,11 +29,8 @@ class Database {
     updateFeedback(filter, update) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const updateDoc = {
-                    $set: update
-                };
                 const db = yield getDb();
-                const result = yield db.collection('feedbacks').updateOne(filter, updateDoc);
+                const result = yield db.collection('feedbacks').updateOne(filter, update);
                 return result;
             }
             catch (e) {

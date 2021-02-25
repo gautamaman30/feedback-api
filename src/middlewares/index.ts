@@ -53,4 +53,12 @@ export class Middleware{
             }    
         });
     }
+
+    checkRequestKeys(req: Request, res: Response, next: NextFunction){
+        let body = req.body;
+        for(let key in body){
+            req.body[key.toLowerCase()] = body[key];
+        }
+        return next();
+    }
 }
