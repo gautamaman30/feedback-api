@@ -1,7 +1,5 @@
 import { Errors } from "./errorsUtils";
 import { Messages } from "./messagesUtils";
-import { ControllersUtils } from "./controllersUtils";
-import { ServicesUtils } from "./servicesUtils";
-declare const servicesUtils: ServicesUtils;
-declare const controllersUtils: ControllersUtils;
-export { Errors, Messages, servicesUtils, controllersUtils };
+import { HelperFunctions } from "./helperFunctions";
+declare const helperFunctions: HelperFunctions;
+export { Errors, Messages, helperFunctions };

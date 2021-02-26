@@ -1,5 +1,5 @@
 import { Database } from '../models/index'
-import {Errors, Messages, servicesUtils } from '../utils/index'
+import {Errors, Messages, helperFunctions } from '../utils/index'
 
 
 const database = new Database();
@@ -64,7 +64,7 @@ export default class UserService{
         try{
             let user: any;
             user = {
-                user_id: servicesUtils.generateId(),
+                user_id: helperFunctions.generateId(),
                 name: user_info.name,
             }
 

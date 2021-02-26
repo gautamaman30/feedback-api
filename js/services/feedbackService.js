@@ -126,26 +126,28 @@ class FeedbackService {
                 let new_feedback;
                 if (feedback_info.user_id) {
                     new_feedback = {
-                        feedback_id: index_2.servicesUtils.generateId(),
+                        feedback_id: index_2.helperFunctions.generateId(),
                         posted_by: feedback_info.posted_by,
                         name: feedback_info.name,
                         user_id: feedback_info.user_id,
                         feedback: feedback_info.feedback,
                         status: 'waiting',
                         created_on: new Date(),
-                        count: 0
+                        count: 0,
+                        count_users: []
                     };
                 }
                 else {
                     new_feedback = {
-                        feedback_id: index_2.servicesUtils.generateId(),
+                        feedback_id: index_2.helperFunctions.generateId(),
                         posted_by: feedback_info.posted_by,
                         name: feedback_info.name,
                         technology_id: feedback_info.technology_id,
                         feedback: feedback_info.feedback,
                         status: 'waiting',
                         created_on: new Date(),
-                        count: 0
+                        count: 0,
+                        count_users: []
                     };
                 }
                 const result = yield database.insertFeedback(new_feedback);
@@ -164,7 +166,7 @@ class FeedbackService {
         return feedback_array.filter((item) => item[key]);
     }
     filterFeedback(feedback_array, key, values) {
-        let set = index_2.servicesUtils.convertArrayToSet(values);
+        let set = index_2.helperFunctions.convertArrayToSet(values);
         return feedback_array.filter((item) => item[key] && set.has(item[key]) ? true : false);
     }
     sortFeedback(feedback_array, key) {

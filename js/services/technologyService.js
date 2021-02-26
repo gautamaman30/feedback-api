@@ -89,7 +89,7 @@ class TechnologyService {
             try {
                 let technology;
                 technology = {
-                    technology_id: index_2.servicesUtils.generateId(),
+                    technology_id: index_2.helperFunctions.generateId(),
                     name: technology_info.name,
                 };
                 if (technology_info.details)

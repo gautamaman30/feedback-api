@@ -1,7 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-export declare class Middleware {
-    signToken(req: Request, res: Response): void;
-    verifyToken(req: Request, res: Response, next: NextFunction): void;
-    checkRequestKeys(req: Request, res: Response, next: NextFunction): void;
-    checkUnknownRoutes(req: Request, res: Response): void;
-}
+import { AuthMiddleware } from "./authMiddleware";
+import { Validator } from "./validatorMiddleware";
+declare const authMiddleware: AuthMiddleware;
+declare const validator: Validator;
+export { authMiddleware, validator };

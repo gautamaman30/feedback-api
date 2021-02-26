@@ -1,7 +1,6 @@
 import {Request, Response } from "express"
 import {userService, technologyService, feedbackService} from "../services/index"
-import { ControllersUtils } from "../utils/controllersUtils";
-import {controllersUtils, Errors} from "../utils/index"
+import {helperFunctions, Errors} from "../utils/index"
 
 
 export default class FeedbackController{
@@ -102,30 +101,14 @@ export default class FeedbackController{
                 throw new Error(Errors.ADMIN_POST_FEEDBACK);
             }
 
-            if(!user_id){ 
-                throw new Error(Errors.USER_ID_REQUIRED);
-            }
-
-            if(!name) {
-                throw new Error(Errors.FEEDBACK_NAME_REQUIRED);       
-            }
-
-            if(!feedback) {
-                throw new Error(Errors.FEEDBACK_REQUIRED);
-            }
-
-            if(feedback.length === 0) {
-                throw new Error(Errors.FEEDBACK_EMPTY);
-            }
-
             const user: any = await userService.checkUserExist("user_id", user_id);
             if(user.error) {
                 throw new Error(user.error);
             }
 
-            name = controllersUtils.lowerCaseStrings(name);
+            name = name.toLowerCase();
 
-            let feedback_info: any = {name: name, feedback: feedback, posted_by: user_id};
+            let feedback_info: any = {name , feedback , posted_by: user_id};
 
             const check_user: any = await userService.checkUserExist("name", name);
             
@@ -168,10 +151,6 @@ export default class FeedbackController{
                 throw new Error(Errors.ADMIN_EDIT_FEEDBACK);
             }
 
-            if(!feedback_id) {
-                throw new Error(Errors.FEEDBACK_ID_REQUIRED);
-            }
-
             const user: any = await userService.checkUserExist("user_id", user_id);
             if(user.error) {
                 throw new Error(user.error); 
@@ -203,25 +182,13 @@ export default class FeedbackController{
         try{
             const admin_key: string = req.body.admin_key;   
             const feedback_id: string = req.body.feedback_id;         
-            let status: string = req.body.status;         
+            let status: any = req.body.status;         
             
             if(!admin_key) {
                 throw new Error(Errors.ADMIN_KEY_REQUIRED);
             }
 
-            if(!feedback_id) {
-                throw new Error(Errors.FEEDBACK_ID_REQUIRED);
-            }
-
-            if(!status) {
-                throw new Error(Errors.FEEDBACK_STATUS_REQUIRED);
-            }
-
-            status = controllersUtils.lowerCaseStrings(status);
-            
-            if(!(status === 'approved' || status === 'rejected')) {
-                throw new Error(Errors.FEEDBACK_STATUS_INCORRECT);
-            }
+            status = helperFunctions.lowerCaseStrings(status);
 
             const admin: any = await userService.checkUserExist("admin_key", admin_key);
             if(admin.error === Errors.INTERNAL_ERROR){
@@ -253,16 +220,13 @@ export default class FeedbackController{
             if(admin_key) {
                 throw new Error(Errors.ADMIN_EDIT_FEEDBACK);
             }
+            
+            name = helperFunctions.lowerCaseStrings(name);
 
-            if(!feedback_id) {
-                throw new Error(Errors.FEEDBACK_ID_REQUIRED);
-            }
-            
-            if(!name) {
-                throw new Error(Errors.USER_NAME_REQUIRED);
-            }
-            
-            name = controllersUtils.lowerCaseStrings(name);
+            const user: any = await userService.checkUserExist("name", name);
+            if(user.error){
+                throw new Error(user.error); 
+            }   
 
             const feedback: any = await feedbackService.checkFeedbackExist("feedback_id", feedback_id);
             if(feedback.error) throw new Error(feedback.error);
@@ -272,7 +236,7 @@ export default class FeedbackController{
                     throw new Error(Errors.FEEDBACK_USER_COUNT_EXIST);
                 }
             }
-            
+
             const result: any = await feedbackService.editFeedbackCount({feedback_id, count_users: name});
             if(feedback.error) {
                 throw new Error(feedback.error);

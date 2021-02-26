@@ -108,24 +108,12 @@ class FeedbackController {
                 if (admin_key) {
                     throw new Error(index_2.Errors.ADMIN_POST_FEEDBACK);
                 }
-                if (!user_id) {
-                    throw new Error(index_2.Errors.USER_ID_REQUIRED);
-                }
-                if (!name) {
-                    throw new Error(index_2.Errors.FEEDBACK_NAME_REQUIRED);
-                }
-                if (!feedback) {
-                    throw new Error(index_2.Errors.FEEDBACK_REQUIRED);
-                }
-                if (feedback.length === 0) {
-                    throw new Error(index_2.Errors.FEEDBACK_EMPTY);
-                }
                 const user = yield index_1.userService.checkUserExist("user_id", user_id);
                 if (user.error) {
                     throw new Error(user.error);
                 }
-                name = index_2.controllersUtils.lowerCaseStrings(name);
-                let feedback_info = { name: name, feedback: feedback, posted_by: user_id };
+                name = name.toLowerCase();
+                let feedback_info = { name, feedback, posted_by: user_id };
                 const check_user = yield index_1.userService.checkUserExist("name", name);
                 if (!(check_user.error)) {
                     if (check_user.user_id === user_id) {
@@ -164,9 +152,6 @@ class FeedbackController {
                 if (admin_key) {
                     throw new Error(index_2.Errors.ADMIN_EDIT_FEEDBACK);
                 }
-                if (!feedback_id) {
-                    throw new Error(index_2.Errors.FEEDBACK_ID_REQUIRED);
-                }
                 const user = yield index_1.userService.checkUserExist("user_id", user_id);
                 if (user.error) {
                     throw new Error(user.error);
@@ -201,16 +186,7 @@ class FeedbackController {
                 if (!admin_key) {
                     throw new Error(index_2.Errors.ADMIN_KEY_REQUIRED);
                 }
-                if (!feedback_id) {
-                    throw new Error(index_2.Errors.FEEDBACK_ID_REQUIRED);
-                }
-                if (!status) {
-                    throw new Error(index_2.Errors.FEEDBACK_STATUS_REQUIRED);
-                }
-                status = index_2.controllersUtils.lowerCaseStrings(status);
-                if (!(status === 'approved' || status === 'rejected')) {
-                    throw new Error(index_2.Errors.FEEDBACK_STATUS_INCORRECT);
-                }
+                status = index_2.helperFunctions.lowerCaseStrings(status);
                 const admin = yield index_1.userService.checkUserExist("admin_key", admin_key);
                 if (admin.error === index_2.Errors.INTERNAL_ERROR) {
                     throw new Error(admin.error);
@@ -241,13 +217,11 @@ class FeedbackController {
                 if (admin_key) {
                     throw new Error(index_2.Errors.ADMIN_EDIT_FEEDBACK);
                 }
-                if (!feedback_id) {
-                    throw new Error(index_2.Errors.FEEDBACK_ID_REQUIRED);
+                name = index_2.helperFunctions.lowerCaseStrings(name);
+                const user = yield index_1.userService.checkUserExist("name", name);
+                if (user.error) {
+                    throw new Error(user.error);
                 }
-                if (!name) {
-                    throw new Error(index_2.Errors.USER_NAME_REQUIRED);
-                }
-                name = index_2.controllersUtils.lowerCaseStrings(name);
                 const feedback = yield index_1.feedbackService.checkFeedbackExist("feedback_id", feedback_id);
                 if (feedback.error)
                     throw new Error(feedback.error);

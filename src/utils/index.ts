@@ -1,11 +1,9 @@
 import { Errors } from "./errorsUtils"
 import { Messages } from "./messagesUtils"
-import { ControllersUtils } from "./controllersUtils"
-import { ServicesUtils } from "./servicesUtils"
+import { HelperFunctions } from "./helperFunctions"
 
 
-const servicesUtils = new ServicesUtils();
-const controllersUtils = new ControllersUtils();
+const helperFunctions = new HelperFunctions();
 
 
-export {Errors, Messages, servicesUtils, controllersUtils};
+export {Errors, Messages, helperFunctions};

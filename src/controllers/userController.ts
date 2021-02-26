@@ -1,6 +1,6 @@
 import {Request, Response, NextFunction} from "express"
 import { userService } from "../services/index"
-import { controllersUtils, Errors} from "../utils/index"
+import { helperFunctions, Errors} from "../utils/index"
 
 
 export default class UserController{
@@ -16,7 +16,7 @@ export default class UserController{
                 if(result.error) throw new Error(result.error);       
             }
             else if(name){ 
-                result = await userService.checkUserExist("name", controllersUtils.lowerCaseStrings(name));
+                result = await userService.checkUserExist("name", helperFunctions.lowerCaseStrings(name));
                 if(result.error) throw new Error(result.error);
             } 
             else{
@@ -34,27 +34,26 @@ export default class UserController{
    
     async postUser(req: Request, res: Response, next: NextFunction){
         try{
+            
             const admin_key: string = req.body.admin_key; 
             let name: string = req.body.name;   
-            
+            let email: string = req.body.email;
+            let title: string = req.body.title;
+            let date_of_birth: Date = req.body.date_of_birth;
+
             if(!admin_key) {
                 throw new Error(Errors.ADMIN_KEY_REQUIRED);
             }
-
-            if(!name) {
-                throw new Error(Errors.USER_NAME_REQUIRED);
-            } 
-
+            
             const admin: any = await userService.checkUserExist("admin_key", admin_key);           
             if(admin.error === Errors.INTERNAL_ERROR) {
                 throw new Error(admin.error);
             }
             if(admin.error) {
                 throw new Error(Errors.ADMIN_NOT_FOUND);
-            }
-
-            name = controllersUtils.lowerCaseStrings(name);    
-
+            }  
+            
+            name = name.toLowerCase();
             const user: any = await userService.checkUserExist("name", name);
             if(user.error === Errors.INTERNAL_ERROR) { 
                 throw new Error(Errors.INTERNAL_ERROR);
@@ -64,21 +63,7 @@ export default class UserController{
             }
 
             let result: any;
-            let user_info: any = {name: name};
-
-            if(req.body.email){ 
-                user_info.email = req.body.email;
-            }
-
-            if(req.body.title) {
-                user_info.title = req.body.title;
-            }
-
-            if(req.body.date_of_birth) {
-                let date = controllersUtils.convertStringToDate(req.body.date_of_birth);
-                if(!date) throw new Error(Errors.DATE_FORMAT_INCORRECT);
-                user_info.date_of_birth = req.body.date;
-            }    
+            let user_info: any = {name, email, title, date_of_birth};
 
             result = await userService.addUser(user_info);
             if(result.error) throw new Error(result.error);

@@ -24,7 +24,7 @@ class UserController {
                         throw new Error(result.error);
                 }
                 else if (name) {
-                    result = yield index_1.userService.checkUserExist("name", index_2.controllersUtils.lowerCaseStrings(name));
+                    result = yield index_1.userService.checkUserExist("name", index_2.helperFunctions.lowerCaseStrings(name));
                     if (result.error)
                         throw new Error(result.error);
                 }
@@ -48,11 +48,11 @@ class UserController {
             try {
                 const admin_key = req.body.admin_key;
                 let name = req.body.name;
+                let email = req.body.email;
+                let title = req.body.title;
+                let date_of_birth = req.body.date_of_birth;
                 if (!admin_key) {
                     throw new Error(index_2.Errors.ADMIN_KEY_REQUIRED);
-                }
-                if (!name) {
-                    throw new Error(index_2.Errors.USER_NAME_REQUIRED);
                 }
                 const admin = yield index_1.userService.checkUserExist("admin_key", admin_key);
                 if (admin.error === index_2.Errors.INTERNAL_ERROR) {
@@ -61,7 +61,7 @@ class UserController {
                 if (admin.error) {
                     throw new Error(index_2.Errors.ADMIN_NOT_FOUND);
                 }
-                name = index_2.controllersUtils.lowerCaseStrings(name);
+                name = name.toLowerCase();
                 const user = yield index_1.userService.checkUserExist("name", name);
                 if (user.error === index_2.Errors.INTERNAL_ERROR) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
@@ -70,19 +70,7 @@ class UserController {
                     throw new Error(index_2.Errors.DUPLICATE_USER_NAME);
                 }
                 let result;
-                let user_info = { name: name };
-                if (req.body.email) {
-                    user_info.email = req.body.email;
-                }
-                if (req.body.title) {
-                    user_info.title = req.body.title;
-                }
-                if (req.body.date_of_birth) {
-                    let date = index_2.controllersUtils.convertStringToDate(req.body.date_of_birth);
-                    if (!date)
-                        throw new Error(index_2.Errors.DATE_FORMAT_INCORRECT);
-                    user_info.date_of_birth = req.body.date;
-                }
+                let user_info = { name, email, title, date_of_birth };
                 result = yield index_1.userService.addUser(user_info);
                 if (result.error)
                     throw new Error(result.error);

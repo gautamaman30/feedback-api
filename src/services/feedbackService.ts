@@ -1,5 +1,5 @@
 import { Database } from '../models/index'
-import {Errors, Messages, servicesUtils } from '../utils/index'
+import {Errors, Messages, helperFunctions } from '../utils/index'
 
 
 const database = new Database();
@@ -116,25 +116,27 @@ export default class FeedbackService{
         
             if(feedback_info.user_id){
                 new_feedback = {
-                    feedback_id: servicesUtils.generateId(),
+                    feedback_id: helperFunctions.generateId(),
                     posted_by: feedback_info.posted_by,
                     name: feedback_info.name,
                     user_id: feedback_info.user_id,
                     feedback: feedback_info.feedback,
                     status: 'waiting',
                     created_on: new Date(),
-                    count: 0
+                    count: 0,
+                    count_users: []
                 }
             } else {
                 new_feedback = {
-                    feedback_id: servicesUtils.generateId(),
+                    feedback_id: helperFunctions.generateId(),
                     posted_by: feedback_info.posted_by,
                     name: feedback_info.name,
                     technology_id: feedback_info.technology_id,
                     feedback: feedback_info.feedback,
                     status: 'waiting',
                     created_on: new Date(),
-                    count: 0
+                    count: 0,
+                    count_users: []
                 }
             }    
 
@@ -156,7 +158,7 @@ export default class FeedbackService{
     }
 
     filterFeedback(feedback_array: Array<any>, key: string, values: string[]) {
-        let set = servicesUtils.convertArrayToSet(values);
+        let set = helperFunctions.convertArrayToSet(values);
         return feedback_array.filter((item) => item[key] && set.has(item[key])? true: false);
     }
 

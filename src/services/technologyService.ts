@@ -1,5 +1,5 @@
 import { Database } from '../models/index'
-import {Errors, Messages, servicesUtils} from '../utils/index'
+import {Errors, Messages, helperFunctions} from '../utils/index'
 
 
 const database = new Database();
@@ -86,7 +86,7 @@ export default class TechnologyService{
         try{
             let technology: any;
             technology = {
-                technology_id: servicesUtils.generateId(),
+                technology_id: helperFunctions.generateId(),
                 name: technology_info.name,
             }
             if(technology_info.details) technology.details = technology_info.details;
