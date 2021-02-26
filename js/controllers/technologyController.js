@@ -24,7 +24,7 @@ class TechnologyController {
                         throw new Error(result.error);
                 }
                 else if (name) {
-                    result = yield index_1.technologyService.checkTechnologyExist("name", index_2.lowerCaseStrings(name));
+                    result = yield index_1.technologyService.checkTechnologyExist("name", index_2.controllersUtils.lowerCaseStrings(name));
                     if (result.error)
                         throw new Error(result.error);
                 }
@@ -61,7 +61,7 @@ class TechnologyController {
                 if (admin.error) {
                     throw new Error(index_2.Errors.ADMIN_NOT_FOUND);
                 }
-                name = index_2.lowerCaseStrings(name);
+                name = index_2.controllersUtils.lowerCaseStrings(name);
                 const technology = yield index_1.technologyService.checkTechnologyExist("name", name);
                 if (technology.error === index_2.Errors.INTERNAL_ERROR) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
@@ -112,7 +112,7 @@ class TechnologyController {
                 if (admin.error) {
                     throw new Error(index_2.Errors.ADMIN_NOT_FOUND);
                 }
-                name = index_2.lowerCaseStrings(name);
+                name = index_2.controllersUtils.lowerCaseStrings(name);
                 const technology = yield index_1.technologyService.checkTechnologyExist("name", name);
                 if (technology.error) {
                     throw new Error(technology.error);
@@ -149,7 +149,7 @@ class TechnologyController {
                 if (admin.error) {
                     throw new Error(index_2.Errors.ADMIN_NOT_FOUND);
                 }
-                name = index_2.lowerCaseStrings(name);
+                name = index_2.controllersUtils.lowerCaseStrings(name);
                 const technology = yield index_1.technologyService.checkTechnologyExist("name", name);
                 if (technology.error) {
                     throw new Error(technology.error);

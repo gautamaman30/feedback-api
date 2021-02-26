@@ -124,7 +124,7 @@ class FeedbackController {
                 if (user.error) {
                     throw new Error(user.error);
                 }
-                name = index_2.lowerCaseStrings(name);
+                name = index_2.controllersUtils.lowerCaseStrings(name);
                 let feedback_info = { name: name, feedback: feedback, posted_by: user_id };
                 const check_user = yield index_1.userService.checkUserExist("name", name);
                 if (!(check_user.error)) {
@@ -207,7 +207,7 @@ class FeedbackController {
                 if (!status) {
                     throw new Error(index_2.Errors.FEEDBACK_STATUS_REQUIRED);
                 }
-                status = index_2.lowerCaseStrings(status);
+                status = index_2.controllersUtils.lowerCaseStrings(status);
                 if (!(status === 'approved' || status === 'rejected')) {
                     throw new Error(index_2.Errors.FEEDBACK_STATUS_INCORRECT);
                 }
@@ -247,7 +247,7 @@ class FeedbackController {
                 if (!name) {
                     throw new Error(index_2.Errors.USER_NAME_REQUIRED);
                 }
-                name = index_2.lowerCaseStrings(name);
+                name = index_2.controllersUtils.lowerCaseStrings(name);
                 const feedback = yield index_1.feedbackService.checkFeedbackExist("feedback_id", feedback_id);
                 if (feedback.error)
                     throw new Error(feedback.error);

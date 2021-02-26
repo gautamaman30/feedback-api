@@ -1,5 +1,5 @@
 import { Database } from '../models/index'
-import {Errors, Messages, generateId, convertArrayToSet} from '../utils/index'
+import {Errors, Messages, servicesUtils } from '../utils/index'
 
 
 const database = new Database();
@@ -116,7 +116,7 @@ export default class FeedbackService{
         
             if(feedback_info.user_id){
                 new_feedback = {
-                    feedback_id: generateId(),
+                    feedback_id: servicesUtils.generateId(),
                     posted_by: feedback_info.posted_by,
                     name: feedback_info.name,
                     user_id: feedback_info.user_id,
@@ -127,7 +127,7 @@ export default class FeedbackService{
                 }
             } else {
                 new_feedback = {
-                    feedback_id: generateId(),
+                    feedback_id: servicesUtils.generateId(),
                     posted_by: feedback_info.posted_by,
                     name: feedback_info.name,
                     technology_id: feedback_info.technology_id,
@@ -156,7 +156,7 @@ export default class FeedbackService{
     }
 
     filterFeedback(feedback_array: Array<any>, key: string, values: string[]) {
-        let set = convertArrayToSet(values);
+        let set = servicesUtils.convertArrayToSet(values);
         return feedback_array.filter((item) => item[key] && set.has(item[key])? true: false);
     }
 

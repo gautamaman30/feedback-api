@@ -57,5 +57,9 @@ class Middleware {
         }
         return next();
     }
+    checkUnknownRoutes(req, res) {
+        res.status(404);
+        res.send({ errors: index_1.Errors.BAD_REQUEST });
+    }
 }
 exports.Middleware = Middleware;

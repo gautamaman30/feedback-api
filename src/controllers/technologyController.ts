@@ -1,7 +1,7 @@
 import { load } from "dotenv/types";
 import {Request, Response } from "express"
 import {userService, technologyService } from "../services/index"
-import { lowerCaseStrings, Errors} from "../utils/index"
+import { controllersUtils, Errors} from "../utils/index"
 
 
 export default class TechnologyController{
@@ -18,7 +18,7 @@ export default class TechnologyController{
                 if(result.error) throw new Error(result.error);       
             }
             else if(name){
-                result = await technologyService.checkTechnologyExist("name", lowerCaseStrings(name));
+                result = await technologyService.checkTechnologyExist("name", controllersUtils.lowerCaseStrings(name));
                 if(result.error) throw new Error(result.error);
             } 
             else{
@@ -55,7 +55,7 @@ export default class TechnologyController{
                 throw new Error(Errors.ADMIN_NOT_FOUND);
             }
             
-            name = lowerCaseStrings(name);
+            name = controllersUtils.lowerCaseStrings(name);
 
             const technology: any = await technologyService.checkTechnologyExist("name", name);
             if(technology.error === Errors.INTERNAL_ERROR) { 
@@ -111,7 +111,7 @@ export default class TechnologyController{
                 throw new Error(Errors.ADMIN_NOT_FOUND);
             }
 
-            name = lowerCaseStrings(name);
+            name = controllersUtils.lowerCaseStrings(name);
 
             const technology: any = await technologyService.checkTechnologyExist("name", name);
             if(technology.error) {
@@ -154,7 +154,7 @@ export default class TechnologyController{
                 throw new Error(Errors.ADMIN_NOT_FOUND);
             }
 
-            name = lowerCaseStrings(name);
+            name = controllersUtils.lowerCaseStrings(name);
 
             const technology: any = await technologyService.checkTechnologyExist("name", name);
             if(technology.error) {

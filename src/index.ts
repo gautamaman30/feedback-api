@@ -10,7 +10,8 @@ const server: http.Server = http.createServer(app);
 app.use(express.json());
 
 
-new RoutesHandler(app).configureRoutes();
+const router = new RoutesHandler();
+app.use('/api/v1', router.configureRoutes());
 
 
 const PORT = process.env.PORT || process.argv[2] || 3000;

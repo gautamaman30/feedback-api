@@ -1,28 +1,28 @@
-import {Application} from "express"
+import {Router} from "express"
 import {Middleware} from "../middlewares/index"
 import {userController, technologyController, feedbackController} from "../controllers/index"
 const middleware = new Middleware();
 
 
 export class RoutesHandler{
-    app: Application; 
-    constructor(app: Application){
-        this.app = app;
+    router: Router; 
+    constructor(){
+        this.router = Router();
     }
 
-    configureRoutes(): Application {
+    configureRoutes(): Router {
 
-        this.app.use('/', middleware.checkRequestKeys, middleware.verifyToken);
-        
+        this.router.use('/', middleware.checkRequestKeys, middleware.verifyToken);
+
         //User routes
-        this.app.route('/api/v1/user')
+        this.router.route('/user')
             .get(userController.getUser)
             .post(userController.postUser, middleware.signToken)
             .delete(userController.deleteUser);
         
         
         //Technology routes
-        this.app.route('/api/v1/technology')
+        this.router.route('/technology')
             .get(technologyController.getTechnology)
             .post(technologyController.postTechnology)
             .delete(technologyController.deleteTechnology)
@@ -30,16 +30,16 @@ export class RoutesHandler{
         
 
         //Feedback routes
-        this.app.route('/api/v1/feedback')
+        this.router.route('/feedback')
             .get(feedbackController.getFeedbacks)
             .post(feedbackController.postFeedback)
             .delete(feedbackController.deleteFeedback)
             .put(feedbackController.updateFeedback);
 
-        this.app.put('/api/v1/feedback/status', feedbackController.updateFeedbackStatus);
-        this.app.put('/api/v1/feedback/count', feedbackController.updateFeedbackCount);
-        this.app.get('/api/v1/user/feedbacks', feedbackController.getFeedbacksByUser);   
+        this.router.put('/feedback/status', feedbackController.updateFeedbackStatus);
+        this.router.put('/feedback/count', feedbackController.updateFeedbackCount);
+        this.router.get('/user/feedbacks', feedbackController.getFeedbacksByUser);   
         
-        return this.app;
+        return this.router;
     }
 }

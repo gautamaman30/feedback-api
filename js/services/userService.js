@@ -72,7 +72,7 @@ class UserService {
             try {
                 let user;
                 user = {
-                    user_id: index_2.generateId(),
+                    user_id: index_2.servicesUtils.generateId(),
                     name: user_info.name,
                 };
                 if (user_info.email)

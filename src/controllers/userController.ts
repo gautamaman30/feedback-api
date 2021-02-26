@@ -1,6 +1,6 @@
 import {Request, Response, NextFunction} from "express"
 import { userService } from "../services/index"
-import {lowerCaseStrings, convertStringToDate, Errors} from "../utils/index"
+import { controllersUtils, Errors} from "../utils/index"
 
 
 export default class UserController{
@@ -16,7 +16,7 @@ export default class UserController{
                 if(result.error) throw new Error(result.error);       
             }
             else if(name){ 
-                result = await userService.checkUserExist("name", lowerCaseStrings(name));
+                result = await userService.checkUserExist("name", controllersUtils.lowerCaseStrings(name));
                 if(result.error) throw new Error(result.error);
             } 
             else{
@@ -53,7 +53,7 @@ export default class UserController{
                 throw new Error(Errors.ADMIN_NOT_FOUND);
             }
 
-            name = lowerCaseStrings(name);    
+            name = controllersUtils.lowerCaseStrings(name);    
 
             const user: any = await userService.checkUserExist("name", name);
             if(user.error === Errors.INTERNAL_ERROR) { 
@@ -75,7 +75,7 @@ export default class UserController{
             }
 
             if(req.body.date_of_birth) {
-                let date = convertStringToDate(req.body.date_of_birth);
+                let date = controllersUtils.convertStringToDate(req.body.date_of_birth);
                 if(!date) throw new Error(Errors.DATE_FORMAT_INCORRECT);
                 user_info.date_of_birth = req.body.date;
             }    

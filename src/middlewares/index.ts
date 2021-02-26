@@ -61,4 +61,9 @@ export class Middleware{
         }
         return next();
     }
+
+    checkUnknownRoutes(req: Request, res: Response){
+        res.status(404);
+        res.send({errors: Errors.BAD_REQUEST});
+    }
 }

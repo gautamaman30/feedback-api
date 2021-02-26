@@ -1,6 +1,6 @@
-import { Application } from "express";
+import { Router } from "express";
 export declare class RoutesHandler {
-    app: Application;
-    constructor(app: Application);
-    configureRoutes(): Application;
+    router: Router;
+    constructor();
+    configureRoutes(): Router;
 }

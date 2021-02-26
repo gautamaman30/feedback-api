@@ -9,6 +9,7 @@ const index_1 = require("./routes/index");
 const app = express_1.default();
 const server = http_1.default.createServer(app);
 app.use(express_1.default.json());
-new index_1.RoutesHandler(app).configureRoutes();
+const router = new index_1.RoutesHandler();
+app.use('/api/v1', router.configureRoutes());
 const PORT = process.env.PORT || process.argv[2] || 3000;
 server.listen(PORT, () => console.log(`server is running at ${PORT}`));

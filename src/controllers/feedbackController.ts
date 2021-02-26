@@ -1,7 +1,7 @@
 import {Request, Response } from "express"
-import { stat } from "fs";
 import {userService, technologyService, feedbackService} from "../services/index"
-import {lowerCaseStrings, Errors} from "../utils/index"
+import { ControllersUtils } from "../utils/controllersUtils";
+import {controllersUtils, Errors} from "../utils/index"
 
 
 export default class FeedbackController{
@@ -123,7 +123,7 @@ export default class FeedbackController{
                 throw new Error(user.error);
             }
 
-            name = lowerCaseStrings(name);
+            name = controllersUtils.lowerCaseStrings(name);
 
             let feedback_info: any = {name: name, feedback: feedback, posted_by: user_id};
 
@@ -217,7 +217,7 @@ export default class FeedbackController{
                 throw new Error(Errors.FEEDBACK_STATUS_REQUIRED);
             }
 
-            status = lowerCaseStrings(status);
+            status = controllersUtils.lowerCaseStrings(status);
             
             if(!(status === 'approved' || status === 'rejected')) {
                 throw new Error(Errors.FEEDBACK_STATUS_INCORRECT);
@@ -262,7 +262,7 @@ export default class FeedbackController{
                 throw new Error(Errors.USER_NAME_REQUIRED);
             }
             
-            name = lowerCaseStrings(name);
+            name = controllersUtils.lowerCaseStrings(name);
 
             const feedback: any = await feedbackService.checkFeedbackExist("feedback_id", feedback_id);
             if(feedback.error) throw new Error(feedback.error);

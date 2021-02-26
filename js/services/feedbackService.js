@@ -126,7 +126,7 @@ class FeedbackService {
                 let new_feedback;
                 if (feedback_info.user_id) {
                     new_feedback = {
-                        feedback_id: index_2.generateId(),
+                        feedback_id: index_2.servicesUtils.generateId(),
                         posted_by: feedback_info.posted_by,
                         name: feedback_info.name,
                         user_id: feedback_info.user_id,
@@ -138,7 +138,7 @@ class FeedbackService {
                 }
                 else {
                     new_feedback = {
-                        feedback_id: index_2.generateId(),
+                        feedback_id: index_2.servicesUtils.generateId(),
                         posted_by: feedback_info.posted_by,
                         name: feedback_info.name,
                         technology_id: feedback_info.technology_id,
@@ -164,7 +164,7 @@ class FeedbackService {
         return feedback_array.filter((item) => item[key]);
     }
     filterFeedback(feedback_array, key, values) {
-        let set = index_2.convertArrayToSet(values);
+        let set = index_2.servicesUtils.convertArrayToSet(values);
         return feedback_array.filter((item) => item[key] && set.has(item[key]) ? true : false);
     }
     sortFeedback(feedback_array, key) {

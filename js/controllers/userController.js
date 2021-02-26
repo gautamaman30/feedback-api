@@ -24,7 +24,7 @@ class UserController {
                         throw new Error(result.error);
                 }
                 else if (name) {
-                    result = yield index_1.userService.checkUserExist("name", index_2.lowerCaseStrings(name));
+                    result = yield index_1.userService.checkUserExist("name", index_2.controllersUtils.lowerCaseStrings(name));
                     if (result.error)
                         throw new Error(result.error);
                 }
@@ -61,7 +61,7 @@ class UserController {
                 if (admin.error) {
                     throw new Error(index_2.Errors.ADMIN_NOT_FOUND);
                 }
-                name = index_2.lowerCaseStrings(name);
+                name = index_2.controllersUtils.lowerCaseStrings(name);
                 const user = yield index_1.userService.checkUserExist("name", name);
                 if (user.error === index_2.Errors.INTERNAL_ERROR) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
@@ -78,7 +78,7 @@ class UserController {
                     user_info.title = req.body.title;
                 }
                 if (req.body.date_of_birth) {
-                    let date = index_2.convertStringToDate(req.body.date_of_birth);
+                    let date = index_2.controllersUtils.convertStringToDate(req.body.date_of_birth);
                     if (!date)
                         throw new Error(index_2.Errors.DATE_FORMAT_INCORRECT);
                     user_info.date_of_birth = req.body.date;
