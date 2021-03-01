@@ -2,16 +2,18 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Errors = void 0;
 exports.Errors = {
-    ADMIN_KEY_REQUIRED: "Admin key is required",
+    ADMIN_POST_USERS: "Only admins can add new users",
     ADMIN_POST_FEEDBACK: "Admin cannot give feedbacks",
     ADMIN_EDIT_FEEDBACK: "Only users can edit their feedback",
     ADMIN_DELETE_ADMIN: "Admin cannot delete another admin",
     ADMIN_NOT_FOUND: "Admin not found",
+    NOT_ADMIN: "User is not authorized as admin",
     USER_NAME_REQUIRED: "User name is required",
     USER_ID_REQUIRED: "User id is required",
+    USER_PASSWORD_INCORRECT: "Incorrect password",
     USER_POST_OWN_FEEDBACK: "User cannot post feedbacks about themselves",
     USER_EDIT_OTHERS_FEEDBACK: "User cannot update other user's feedbacks",
-    DUPLICATE_USER_NAME: "User with this name already exists",
+    DUPLICATE_EMAIL: "User with this email already exists",
     USER_NOT_FOUND: "User not found",
     TECHNOLOGY_NAME_REQUIRED: "Technology name is required",
     TECHNOLOGY_DETAILS_REQUIRED: "Technology details is required",

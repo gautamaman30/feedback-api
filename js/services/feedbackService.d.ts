@@ -1,5 +1,9 @@
 export default class FeedbackService {
     getAllFeedbacks(): Promise<any>;
+    getFeedbacks(filter: any): Promise<any>;
+    getFilteredAndSortedFeedbacks(filter: any, sort: any): Promise<any>;
+    getSortedFeedbacks(sort: any): Promise<any>;
+    getFilteredFeedbacks(filter: any): Promise<any>;
     editFeedbackStatus(feedback_info: {
         feedback_id: string;
         status: "approved" | "rejected";
@@ -53,7 +57,5 @@ export default class FeedbackService {
         error: any;
         message?: undefined;
     }>;
-    filterFeedbackKeys(feedback_array: Array<any>, key: string): any[];
     filterFeedback(feedback_array: Array<any>, key: string, values: string[]): any[];
-    sortFeedback(feedback_array: Array<any>, key: string): any[];
 }

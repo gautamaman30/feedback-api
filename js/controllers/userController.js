@@ -17,14 +17,20 @@ class UserController {
             try {
                 const user_id = req.query.user_id;
                 const name = req.query.name;
+                const email = req.query.email;
                 let result;
                 if (user_id) {
                     result = yield index_1.userService.checkUserExist("user_id", user_id);
                     if (result.error)
                         throw new Error(result.error);
                 }
+                else if (email) {
+                    result = yield index_1.userService.checkUserExist("email", email);
+                    if (result.error)
+                        throw new Error(result.error);
+                }
                 else if (name) {
-                    result = yield index_1.userService.checkUserExist("name", index_2.helperFunctions.lowerCaseStrings(name));
+                    result = yield index_1.userService.getUsers("name", name.toLowerCase());
                     if (result.error)
                         throw new Error(result.error);
                 }
@@ -46,38 +52,71 @@ class UserController {
     postUser(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const admin_key = req.body.admin_key;
+                const admin_id = req.body.user_id;
                 let name = req.body.name;
                 let email = req.body.email;
                 let title = req.body.title;
                 let date_of_birth = req.body.date_of_birth;
-                if (!admin_key) {
-                    throw new Error(index_2.Errors.ADMIN_KEY_REQUIRED);
-                }
-                const admin = yield index_1.userService.checkUserExist("admin_key", admin_key);
-                if (admin.error === index_2.Errors.INTERNAL_ERROR) {
+                const admin = yield index_1.userService.checkAdminExist("user_id", admin_id);
+                if (admin.error) {
                     throw new Error(admin.error);
                 }
-                if (admin.error) {
-                    throw new Error(index_2.Errors.ADMIN_NOT_FOUND);
-                }
-                name = name.toLowerCase();
-                const user = yield index_1.userService.checkUserExist("name", name);
+                const user = yield index_1.userService.checkUserExist("email", email);
                 if (user.error === index_2.Errors.INTERNAL_ERROR) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }
                 if (user.user_id) {
-                    throw new Error(index_2.Errors.DUPLICATE_USER_NAME);
+                    throw new Error(index_2.Errors.DUPLICATE_EMAIL);
                 }
-                let result;
-                let user_info = { name, email, title, date_of_birth };
-                result = yield index_1.userService.addUser(user_info);
-                if (result.error)
+                name = name.toLowerCase();
+                let password = index_2.helperFunctions.generateRandomPassword();
+                password = yield index_2.helperFunctions.hashPassword(password);
+                let user_info = { name, email, password, title, date_of_birth };
+                let result = yield index_1.userService.addUser(user_info);
+                if (result.error) {
                     throw new Error(result.error);
-                res.setHeader("user_id", result.user_id);
-                res.setHeader("name", result.name);
+                }
+                const payload = JSON.stringify({
+                    user_id: result.user_id,
+                    name: result.name,
+                    email: result.email
+                });
+                res.set("payload", payload);
+                res.set("password", password);
                 res.status(201);
-                next();
+                return next();
+            }
+            catch (e) {
+                console.log(e.message);
+                res.status(400);
+                res.send({ error: e.message });
+            }
+        });
+    }
+    loginUser(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let email = req.body.email;
+                let password = req.body.password;
+                const user = yield index_1.userService.checkUserExist("email", email);
+                if (user.error) {
+                    throw new Error(user.error);
+                }
+                const result = yield index_2.helperFunctions.comparePassword(password, user.password);
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+                if (!result) {
+                    throw new Error(index_2.Errors.USER_PASSWORD_INCORRECT);
+                }
+                const payload = JSON.stringify({
+                    user_id: user.user_id,
+                    name: user.name,
+                    email: user.email
+                });
+                res.setHeader("payload", payload);
+                res.status(200);
+                return next();
             }
             catch (e) {
                 console.log(e.message);
@@ -89,26 +128,20 @@ class UserController {
     deleteUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const admin_key = req.body.admin_key;
-                const user_id = req.body.user_id;
-                if (!admin_key) {
-                    throw new Error(index_2.Errors.ADMIN_KEY_REQUIRED);
-                }
-                if (!user_id) {
-                    throw new Error(index_2.Errors.USER_ID_REQUIRED);
-                }
-                const admin = yield index_1.userService.checkUserExist("admin_key", admin_key);
+                const admin_id = req.body.user_id;
+                const email = req.body.email;
+                const admin = yield index_1.userService.checkAdminExist("user_id", admin_id);
                 if (admin.error) {
                     throw new Error(admin.error);
                 }
-                const user = yield index_1.userService.checkUserExist("user_id", user_id);
+                const user = yield index_1.userService.checkUserExist("email", email);
                 if (user.error) {
                     throw new Error(user.error);
                 }
-                if (user.admin_key) {
+                if (user.roles === "admin") {
                     throw new Error(index_2.Errors.ADMIN_DELETE_ADMIN);
                 }
-                const result = yield index_1.userService.removeUser({ user_id });
+                const result = yield index_1.userService.removeUser({ email });
                 if (result.error) {
                     throw new Error(result.error);
                 }

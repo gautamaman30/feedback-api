@@ -18,11 +18,33 @@ export default class UserService{
             console.log(err);
             return {error: Errors.INTERNAL_ERROR};
         }
-    } 
+    }
 
-    async removeUser(user_info: {user_id: string}){
+    async getUsers(key: string, value: any){
+
         try{
-            const result = await database.deleteUser({ user_id: user_info.user_id });
+            let user_info: any = {};
+            user_info[key] = value;
+
+            const result = await database.findUsers(user_info);
+
+            if(!result){
+                throw new Error(Errors.USER_NOT_FOUND);
+            }
+            if(result.error){
+                throw new Error(Errors.INTERNAL_ERROR);
+            }
+            return result;
+        } catch(err) {
+            console.log(err);
+            return {error: err.message};
+        }
+
+    }
+
+    async removeUser(user_info: {email: string}){
+        try{
+            const result = await database.deleteUser({ email: user_info.email });
 
             if(result.error){
                 throw new Error(Errors.INTERNAL_ERROR);
@@ -42,7 +64,7 @@ export default class UserService{
         try{
             let user_info: any = {};
             user_info[key] = value;
-           
+
             const result = await database.findUser(user_info);
 
             if(!result){
@@ -56,22 +78,45 @@ export default class UserService{
             console.log(err);
             return {error: err.message};
         }
-
     }
 
-    async addUser(user_info: {name: string, email?: string, title?: string, date_of_birth?: Date}){
+    async checkAdminExist(key: string, value: any){
+
+        try{
+            let user_info: any = {};
+            user_info[key] = value;
+
+            const result = await database.findUser(user_info);
+
+            if(!result){
+                throw new Error(Errors.ADMIN_NOT_FOUND);
+            }
+            if(result.error){
+                throw new Error(Errors.INTERNAL_ERROR);
+            }
+            if(result.roles !== "admin"){
+                throw new Error(Errors.NOT_ADMIN);
+            }
+            return result;
+        } catch(err) {
+            console.log(err);
+            return {error: err.message};
+        }
+    }
+
+    async addUser(user_info: {name: string, email: string, title?: string, date_of_birth?: Date}){
 
         try{
             let user: any;
             user = {
                 user_id: helperFunctions.generateId(),
                 name: user_info.name,
+                email: user_info.email
             }
 
-            if(user_info.email) user.email = user_info.email;
             if(user_info.title) user.title = user_info.title;
             if(user_info.date_of_birth) user.date_of_birth = user_info.date_of_birth;
-            
+
             const result = await database.insertUser(user);
 
             if(result.error || result.insertedCount < 1){

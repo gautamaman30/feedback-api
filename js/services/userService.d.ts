@@ -1,7 +1,8 @@
 export default class UserService {
     getAllUsers(): Promise<any>;
+    getUsers(key: string, value: any): Promise<any>;
     removeUser(user_info: {
-        user_id: string;
+        email: string;
     }): Promise<{
         message: string;
         error?: undefined;
@@ -10,9 +11,10 @@ export default class UserService {
         message?: undefined;
     }>;
     checkUserExist(key: string, value: any): Promise<any>;
+    checkAdminExist(key: string, value: any): Promise<any>;
     addUser(user_info: {
         name: string;
-        email?: string;
+        email: string;
         title?: string;
         date_of_birth?: Date;
     }): Promise<any>;

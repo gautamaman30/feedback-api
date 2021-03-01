@@ -19,6 +19,81 @@ export default class FeedbackService{
         }
     }
 
+    async getFeedbacks(filter){
+        try{
+            let query: any = filter;
+            const result = await database.findFeedbacks(query);
+            if(result.error){
+                throw new Error(Errors.INTERNAL_ERROR);
+            }
+            return result;
+        } catch(err) {
+            console.log(err);
+            return {error: Errors.INTERNAL_ERROR};
+        }
+    }
+
+    async getFilteredAndSortedFeedbacks(filter, sort){
+        try{
+            let query: any = {};
+            if(filter === "status"){
+                query[filter] = "approved";
+            }
+            else{
+                query[filter] = { '$exists': true};
+            }
+
+            let sortField: any = {};
+            sortField[sort] = -1;
+
+            const result = await database.findFeedbacksSorted(query, sortField);
+            if(result.error){
+                throw new Error(Errors.INTERNAL_ERROR);
+            }
+            return result;
+        } catch(err) {
+            console.log(err);
+            return {error: Errors.INTERNAL_ERROR};
+        }
+    }
+
+    async getSortedFeedbacks(sort){
+        try{
+            let sortField: any = {};
+            sortField[sort] = -1;
+
+            const result = await database.findFeedbacksSorted({}, sortField);
+            if(result.error){
+                throw new Error(Errors.INTERNAL_ERROR);
+            }
+
+            return result;
+        } catch(err) {
+            console.log(err);
+            return {error: Errors.INTERNAL_ERROR};
+        }
+    }
+
+    async getFilteredFeedbacks(filter){
+        try{
+            let query: any = {};
+            if(filter === "status"){
+                query[filter] = "approved";
+            }
+            else{
+                query[filter] = { '$exists': true};
+            }
+            const result = await database.findFeedbacks(query);
+            if(result.error){
+                throw new Error(Errors.INTERNAL_ERROR);
+            }
+            return result;
+        } catch(err) {
+            console.log(err);
+            return {error: Errors.INTERNAL_ERROR};
+        }
+    }
+
     async editFeedbackStatus(feedback_info: {feedback_id: string, status: "approved" | "rejected"}){
 
         try{
@@ -94,7 +169,7 @@ export default class FeedbackService{
         try{
             let feedback_info: any = {};
             feedback_info[key] = value;
-           
+
             const result = await database.findFeedback(feedback_info);
             if(!result){
                 throw new Error(Errors.FEEDBACK_NOT_FOUND);
@@ -113,7 +188,7 @@ export default class FeedbackService{
 
         try{
             let new_feedback: any;
-        
+
             if(feedback_info.user_id){
                 new_feedback = {
                     feedback_id: helperFunctions.generateId(),
@@ -138,7 +213,7 @@ export default class FeedbackService{
                     count: 0,
                     count_users: []
                 }
-            }    
+            }
 
             const result = await database.insertFeedback(new_feedback);
 
@@ -150,28 +225,11 @@ export default class FeedbackService{
         } catch(err) {
             console.log(err);
             return {error: err.message};
-        } 
-    }
-
-    filterFeedbackKeys(feedback_array: Array<any>, key: string){
-        return feedback_array.filter((item) => item[key]);
+        }
     }
 
     filterFeedback(feedback_array: Array<any>, key: string, values: string[]) {
         let set = helperFunctions.convertArrayToSet(values);
         return feedback_array.filter((item) => item[key] && set.has(item[key])? true: false);
-    }
-
-    sortFeedback(feedback_array: Array<any>, key: string){
-        feedback_array.sort(function(a, b){
-            if(key === "created_on") {
-                return b.created_on.getMilliseconds() - a.created_on.getMilliseconds(); 
-            } 
-            if(key === "count") {
-                return b.count - a.count;
-            } 
-            return 0;
-        });
-        return feedback_array;
     }
 }

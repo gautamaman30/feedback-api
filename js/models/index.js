@@ -26,6 +26,32 @@ class Database {
             }
         });
     }
+    findFeedbacksSorted(query, sortField) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const db = yield getDb();
+                const result = yield db.collection("feedbacks").find(query).sort(sortField);
+                return result;
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+        });
+    }
+    findFeedbacks(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const db = yield getDb();
+                const result = yield db.collection("feedbacks").find(query);
+                return result;
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+        });
+    }
     updateFeedback(filter, update) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -99,6 +125,19 @@ class Database {
             try {
                 const db = yield getDb();
                 const result = yield db.collection('users').findOne(query);
+                return result;
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+        });
+    }
+    findUsers(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const db = yield getDb();
+                const result = yield db.collection('users').find(query);
                 return result;
             }
             catch (e) {

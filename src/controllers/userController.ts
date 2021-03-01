@@ -7,18 +7,23 @@ export default class UserController{
 
     async getUser(req: Request, res: Response){
         try{
-            const user_id = req.query.user_id;
+            const user_id: any = req.query.user_id;
             const name: any = req.query.name;
-            
+            const email: any = req.query.email;
+
             let result;
             if(user_id){
                 result = await userService.checkUserExist("user_id", user_id);
-                if(result.error) throw new Error(result.error);       
-            }
-            else if(name){ 
-                result = await userService.checkUserExist("name", helperFunctions.lowerCaseStrings(name));
                 if(result.error) throw new Error(result.error);
-            } 
+            }
+            else if(email){
+                result = await userService.checkUserExist("email", email);
+                if(result.error) throw new Error(result.error);
+            }
+            else if(name){
+                result = await userService.getUsers("name", name.toLowerCase());
+                if(result.error) throw new Error(result.error);
+            }
             else{
                 result = await userService.getAllUsers();
                 if(result.error) throw new Error(result.error);
@@ -31,47 +36,85 @@ export default class UserController{
             res.send({error: e.message});
         }
     }
-   
+
     async postUser(req: Request, res: Response, next: NextFunction){
         try{
-            
-            const admin_key: string = req.body.admin_key; 
-            let name: string = req.body.name;   
+            const admin_id: string = req.body.user_id;
+            let name: string = req.body.name;
             let email: string = req.body.email;
             let title: string = req.body.title;
             let date_of_birth: Date = req.body.date_of_birth;
 
-            if(!admin_key) {
-                throw new Error(Errors.ADMIN_KEY_REQUIRED);
-            }
-            
-            const admin: any = await userService.checkUserExist("admin_key", admin_key);           
-            if(admin.error === Errors.INTERNAL_ERROR) {
+
+            const admin: any = await userService.checkAdminExist("user_id", admin_id);
+            if(admin.error) {
                 throw new Error(admin.error);
             }
-            if(admin.error) {
-                throw new Error(Errors.ADMIN_NOT_FOUND);
-            }  
-            
-            name = name.toLowerCase();
-            const user: any = await userService.checkUserExist("name", name);
-            if(user.error === Errors.INTERNAL_ERROR) { 
+
+            const user: any = await userService.checkUserExist("email", email);
+            if(user.error === Errors.INTERNAL_ERROR) {
                 throw new Error(Errors.INTERNAL_ERROR);
             }
-            if(user.user_id) { 
-                throw new Error(Errors.DUPLICATE_USER_NAME);
+            if(user.user_id) {
+                throw new Error(Errors.DUPLICATE_EMAIL);
             }
 
-            let result: any;
-            let user_info: any = {name, email, title, date_of_birth};
+            name = name.toLowerCase();
 
-            result = await userService.addUser(user_info);
-            if(result.error) throw new Error(result.error);
-            
-            res.setHeader("user_id", result.user_id);
-            res.setHeader("name", result.name);
+            let password: string = helperFunctions.generateRandomPassword();
+            password = await helperFunctions.hashPassword(password);
+
+            let user_info: any = {name, email, password, title, date_of_birth};
+
+            let result = await userService.addUser(user_info);
+            if(result.error) {
+                throw new Error(result.error);
+            }
+
+            const payload: string = JSON.stringify({
+                user_id: result.user_id,
+                name: result.name,
+                email: result.email
+            });
+
+            res.set("payload", payload);
+            res.set("password", password);
             res.status(201);
-            next();
+            return next();
+        } catch(e){
+            console.log(e.message);
+            res.status(400);
+            res.send({error: e.message});
+        }
+    }
+
+    async loginUser(req: Request, res: Response, next: NextFunction){
+        try{
+            let email: string = req.body.email;
+            let password: string = req.body.password;
+
+            const user: any = await userService.checkUserExist("email", email);
+            if(user.error) {
+                throw new Error(user.error);
+            }
+
+            const result: any = await helperFunctions.comparePassword(password, user.password);
+            if(result.error){
+                throw new Error(result.error);
+            }
+            if(!result){
+                throw new Error(Errors.USER_PASSWORD_INCORRECT);
+            }
+
+            const payload: string = JSON.stringify({
+                user_id: user.user_id,
+                name: user.name,
+                email: user.email
+            });
+
+            res.setHeader("payload", payload);
+            res.status(200);
+            return next();
         } catch(e){
             console.log(e.message);
             res.status(400);
@@ -81,36 +124,26 @@ export default class UserController{
 
     async deleteUser(req: Request, res: Response){
         try{
+            const admin_id: string = req.body.user_id;
+            const email: string = req.body.email;
 
-            const admin_key: string = req.body.admin_key;  
-            const user_id: string = req.body.user_id;       
-
-            if(!admin_key) {
-                throw new Error(Errors.ADMIN_KEY_REQUIRED);
-            }
-
-            if(!user_id) {
-                throw new Error(Errors.USER_ID_REQUIRED);
-            }    
-
-            const admin: any = await userService.checkUserExist("admin_key", admin_key);
+            const admin: any = await userService.checkAdminExist("user_id", admin_id);
             if(admin.error) {
                 throw new Error(admin.error);
             }
 
-            const user: any = await userService.checkUserExist("user_id", user_id);
+            const user: any = await userService.checkUserExist("email", email);
             if(user.error) {
                 throw new Error(user.error);
             }
-
-            if(user.admin_key) {
+            if(user.roles === "admin") {
                 throw new Error(Errors.ADMIN_DELETE_ADMIN);
             }
 
-            const result: any = await userService.removeUser({user_id});
+            const result: any = await userService.removeUser({email});
             if(result.error) {
                 throw new Error(result.error);
-            }    
+            }
             res.status(200);
             res.send(result);
         } catch(e){
@@ -118,6 +151,6 @@ export default class UserController{
             res.status(400);
             res.send({error: e.message});
         }
-    } 
-    
+    }
+
 }

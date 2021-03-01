@@ -1,44 +1,56 @@
 import {Router} from "express"
-import {authMiddleware, validator} from "../middlewares/index"
+import {authMiddleware, feedbackValidator, userValidator, technologyValidator} from "../middlewares/index"
 import {userController, technologyController, feedbackController} from "../controllers/index"
 
 
 export class RoutesHandler{
-    router: Router; 
+    router: Router;
+
     constructor(){
         this.router = Router();
     }
 
+
     configureRoutes(): Router {
 
-        this.router.use('/', authMiddleware.checkRequestKeys, authMiddleware.verifyToken);
+        this.router.use('/', authMiddleware.checkRequestKeys);
 
+        this.router.post('/user/login', userValidator.loginUser, userController.loginUser, authMiddleware.signToken);
+
+        this.router.use('/', authMiddleware.verifyToken);
+        
         //User routes
         this.router.route('/user')
             .get(userController.getUser)
-            .post(validator.createUserValidator, userController.postUser, authMiddleware.signToken)
-            .delete(userController.deleteUser);
-        
-        
+            .post(userValidator.postUser, userController.postUser, authMiddleware.signToken)
+            .delete(userValidator.deleteUser, userController.deleteUser);
+
+
         //Technology routes
         this.router.route('/technology')
             .get(technologyController.getTechnology)
-            .post(validator.createTechnologyValidator, technologyController.postTechnology)
-            .delete(technologyController.deleteTechnology)
-            .put(validator.createTechnologyValidator, technologyController.updateTechnology);
-        
+            .post(technologyValidator.postAndUpdateTechnology, technologyController.postTechnology)
+            .delete(technologyValidator.deleteTechnology, technologyController.deleteTechnology)
+            .put(technologyValidator.postAndUpdateTechnology, technologyController.updateTechnology);
+
 
         //Feedback routes
         this.router.route('/feedback')
             .get(feedbackController.getFeedbacks)
-            .post(validator.createFeedbackValidator, feedbackController.postFeedback)
-            .delete(feedbackController.deleteFeedback)
-            .put(validator.updateFeedbackValidator, feedbackController.updateFeedback);
-            
-        this.router.put('/feedback/status', validator.updateFeedbackStatusValidator, feedbackController.updateFeedbackStatus);
-        this.router.put('/feedback/count', validator.updateFeedbackCountValidator, feedbackController.updateFeedbackCount);
-        this.router.get('/user/feedbacks', feedbackController.getFeedbacksByUser);   
-        
+            .post(feedbackValidator.postFeedback, feedbackController.postFeedback)
+            .delete(feedbackValidator.deleteFeedback, feedbackController.deleteFeedback)
+            .put(feedbackValidator.updateFeedback, feedbackController.updateFeedback);
+
+        // change feedback status
+        this.router.put('/feedback/status', feedbackValidator.updateFeedbackStatus, feedbackController.updateFeedbackStatus);
+
+        //add user count for a feedback
+        this.router.put('/feedback/count', feedbackValidator.updateFeedbackCount, feedbackController.updateFeedbackCount);
+
+        //get all feedbacks posted by a user
+        this.router.get('/user/feedbacks', feedbackValidator.getFeedback, feedbackController.getFeedbacksByUser);
+
+
         return this.router;
     }
 }

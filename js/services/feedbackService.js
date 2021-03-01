@@ -28,6 +28,85 @@ class FeedbackService {
             }
         });
     }
+    getFeedbacks(filter) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let query = filter;
+                const result = yield database.findFeedbacks(query);
+                if (result.error) {
+                    throw new Error(index_2.Errors.INTERNAL_ERROR);
+                }
+                return result;
+            }
+            catch (err) {
+                console.log(err);
+                return { error: index_2.Errors.INTERNAL_ERROR };
+            }
+        });
+    }
+    getFilteredAndSortedFeedbacks(filter, sort) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let query = {};
+                if (filter === "status") {
+                    query[filter] = "approved";
+                }
+                else {
+                    query[filter] = { '$exists': true };
+                }
+                let sortField = {};
+                sortField[sort] = -1;
+                const result = yield database.findFeedbacksSorted(query, sortField);
+                if (result.error) {
+                    throw new Error(index_2.Errors.INTERNAL_ERROR);
+                }
+                return result;
+            }
+            catch (err) {
+                console.log(err);
+                return { error: index_2.Errors.INTERNAL_ERROR };
+            }
+        });
+    }
+    getSortedFeedbacks(sort) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let sortField = {};
+                sortField[sort] = -1;
+                const result = yield database.findFeedbacksSorted({}, sortField);
+                if (result.error) {
+                    throw new Error(index_2.Errors.INTERNAL_ERROR);
+                }
+                return result;
+            }
+            catch (err) {
+                console.log(err);
+                return { error: index_2.Errors.INTERNAL_ERROR };
+            }
+        });
+    }
+    getFilteredFeedbacks(filter) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let query = {};
+                if (filter === "status") {
+                    query[filter] = "approved";
+                }
+                else {
+                    query[filter] = { '$exists': true };
+                }
+                const result = yield database.findFeedbacks(query);
+                if (result.error) {
+                    throw new Error(index_2.Errors.INTERNAL_ERROR);
+                }
+                return result;
+            }
+            catch (err) {
+                console.log(err);
+                return { error: index_2.Errors.INTERNAL_ERROR };
+            }
+        });
+    }
     editFeedbackStatus(feedback_info) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -162,24 +241,9 @@ class FeedbackService {
             }
         });
     }
-    filterFeedbackKeys(feedback_array, key) {
-        return feedback_array.filter((item) => item[key]);
-    }
     filterFeedback(feedback_array, key, values) {
         let set = index_2.helperFunctions.convertArrayToSet(values);
         return feedback_array.filter((item) => item[key] && set.has(item[key]) ? true : false);
-    }
-    sortFeedback(feedback_array, key) {
-        feedback_array.sort(function (a, b) {
-            if (key === "created_on") {
-                return b.created_on.getMilliseconds() - a.created_on.getMilliseconds();
-            }
-            if (key === "count") {
-                return b.count - a.count;
-            }
-            return 0;
-        });
-        return feedback_array;
     }
 }
 exports.default = FeedbackService;

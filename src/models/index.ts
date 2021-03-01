@@ -3,11 +3,33 @@ const getDb = new ConnectDb().getDb;
 
 
 export class Database{
-    
+
     async findAll(collectionName: string){
         try{
             const db = await getDb();
             const result = await db.collection(`${collectionName}`).find({}).toArray();
+            return result;
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+    }
+
+    async findFeedbacksSorted(query, sortField){
+        try{
+            const db = await getDb();
+            const result = await db.collection("feedbacks").find(query).sort(sortField);
+            return result;
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+    }
+
+    async findFeedbacks(query){
+        try{
+            const db = await getDb();
+            const result = await db.collection("feedbacks").find(query);
             return result;
         } catch(e){
             console.log(e);
@@ -84,6 +106,17 @@ export class Database{
         }
     }
 
+    async findUsers(query){
+        try{
+            const db = await getDb();
+            const result = await db.collection('users').find(query);
+            return result;
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+    }
+
     async findTechnology(query){
         try{
             const db = await getDb();
@@ -138,7 +171,4 @@ export class Database{
             return {error: e.message};
         }
     }
-} 
-
-
-
+}

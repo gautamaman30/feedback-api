@@ -29,10 +29,30 @@ class UserService {
             }
         });
     }
+    getUsers(key, value) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let user_info = {};
+                user_info[key] = value;
+                const result = yield database.findUsers(user_info);
+                if (!result) {
+                    throw new Error(index_2.Errors.USER_NOT_FOUND);
+                }
+                if (result.error) {
+                    throw new Error(index_2.Errors.INTERNAL_ERROR);
+                }
+                return result;
+            }
+            catch (err) {
+                console.log(err);
+                return { error: err.message };
+            }
+        });
+    }
     removeUser(user_info) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield database.deleteUser({ user_id: user_info.user_id });
+                const result = yield database.deleteUser({ email: user_info.email });
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }
@@ -67,6 +87,29 @@ class UserService {
             }
         });
     }
+    checkAdminExist(key, value) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let user_info = {};
+                user_info[key] = value;
+                const result = yield database.findUser(user_info);
+                if (!result) {
+                    throw new Error(index_2.Errors.ADMIN_NOT_FOUND);
+                }
+                if (result.error) {
+                    throw new Error(index_2.Errors.INTERNAL_ERROR);
+                }
+                if (result.roles !== "admin") {
+                    throw new Error(index_2.Errors.NOT_ADMIN);
+                }
+                return result;
+            }
+            catch (err) {
+                console.log(err);
+                return { error: err.message };
+            }
+        });
+    }
     addUser(user_info) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -74,9 +117,8 @@ class UserService {
                 user = {
                     user_id: index_2.helperFunctions.generateId(),
                     name: user_info.name,
+                    email: user_info.email
                 };
-                if (user_info.email)
-                    user.email = user_info.email;
                 if (user_info.title)
                     user.title = user_info.title;
                 if (user_info.date_of_birth)

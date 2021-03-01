@@ -7,34 +7,32 @@ exports.AuthMiddleware = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const index_1 = require("../utils/index");
 class AuthMiddleware {
-    signToken(req, res) {
+    signToken(req, res, next) {
         const signOptions = {
             issuer: process.env.JWT_TOKEN_ISSUER,
             expiresIn: process.env.JWT_TOKEN_EXPIRES_IN,
             algorithm: process.env.JWT_TOKEN_ALGORITHM
         };
-        let obj = {
-            user_id: res.get("user_id"),
-            name: res.get("name")
-        };
         const key = process.env.SECRET_KEY;
-        jsonwebtoken_1.default.sign(obj, key, signOptions, function (err, result) {
+        let payload = JSON.parse(res.get("payload"));
+        jsonwebtoken_1.default.sign(payload, key, signOptions, function (err, token) {
             if (err) {
                 console.log(err);
                 res.status(500);
                 res.send({ error: index_1.Errors.INTERNAL_ERROR });
             }
-            if (result) {
-                console.log(result);
-                obj.token = result;
-                res.send(obj);
+            if (token) {
+                console.log(token);
+                if (res.get("password")) {
+                    let password = res.get("password");
+                    res.set("password", '');
+                    res.send({ password, token });
+                }
+                res.send({ token });
             }
         });
     }
     verifyToken(req, res, next) {
-        if (req.body.admin_key) {
-            return next();
-        }
         let token;
         if (req.headers.authorization) {
             token = req.headers.authorization.split(' ')[1];
@@ -46,6 +44,7 @@ class AuthMiddleware {
                 res.send({ error: index_1.Errors.AUTHORIZATION_FAILED });
             }
             if (result) {
+                req.body.user_id = result.user_id;
                 return next();
             }
         });

@@ -1,9 +1,13 @@
 import { AuthMiddleware } from "./authMiddleware"
-import { Validator } from "./validatorMiddleware"
+import { FeedbackValidator } from "./feedbackValidatorMiddleware"
+import { TechnologyValidator } from "./technologyValidatorMiddleware"
+import { UserValidator } from "./userValidatorMiddleware"
 
 
 const authMiddleware = new AuthMiddleware();
-const validator = new Validator();
+const userValidator = new UserValidator();
+const feedbackValidator = new FeedbackValidator();
+const technologyValidator = new TechnologyValidator();
 
 
-export {authMiddleware, validator};
+export {authMiddleware, userValidator, feedbackValidator, technologyValidator};

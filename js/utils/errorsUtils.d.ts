@@ -1,14 +1,16 @@
 export declare const Errors: {
-    ADMIN_KEY_REQUIRED: string;
+    ADMIN_POST_USERS: string;
     ADMIN_POST_FEEDBACK: string;
     ADMIN_EDIT_FEEDBACK: string;
     ADMIN_DELETE_ADMIN: string;
     ADMIN_NOT_FOUND: string;
+    NOT_ADMIN: string;
     USER_NAME_REQUIRED: string;
     USER_ID_REQUIRED: string;
+    USER_PASSWORD_INCORRECT: string;
     USER_POST_OWN_FEEDBACK: string;
     USER_EDIT_OTHERS_FEEDBACK: string;
-    DUPLICATE_USER_NAME: string;
+    DUPLICATE_EMAIL: string;
     USER_NOT_FOUND: string;
     TECHNOLOGY_NAME_REQUIRED: string;
     TECHNOLOGY_DETAILS_REQUIRED: string;
