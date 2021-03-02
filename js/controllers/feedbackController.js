@@ -19,13 +19,13 @@ class FeedbackController {
                 const feedback_id = req.query.feedback_id;
                 const filter = req.query.filter;
                 const sort = req.query.sort;
-                let feedbacks;
+                let feedbacks = [];
                 if (feedback_id) {
                     const feedback = yield index_1.feedbackService.checkFeedbackExist("feedback_id", feedback_id);
                     if (feedback.error) {
                         throw new Error(feedback.error);
                     }
-                    feedbacks = feedback;
+                    feedbacks[0] = feedback;
                 }
                 else if (filter || sort) {
                     const queryMapping = {
@@ -44,6 +44,9 @@ class FeedbackController {
                     if (sort) {
                         feedbacks = yield index_1.feedbackService.getFeedbacksSorted(queryMapping[sort]);
                     }
+                }
+                else {
+                    feedbacks = yield index_1.feedbackService.getAllFeedbacks();
                 }
                 let user = yield index_1.userService.checkUserExist("user_id", user_id);
                 if (user.error) {
@@ -93,7 +96,7 @@ class FeedbackController {
             }
         });
     }
-    postFeedback(req, res) {
+    postUserFeedback(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const user_id = req.body.user_id;
@@ -107,24 +110,48 @@ class FeedbackController {
                 if (user.roles === "admin") {
                     throw new Error(index_2.Errors.ADMIN_POST_FEEDBACK);
                 }
-                let feedback_info = { name, feedback, posted_by: user_id };
-                if (email) {
-                    const check_user = yield index_1.userService.checkUserExist("email", email);
-                    if (check_user.error) {
-                        throw new Error(check_user.error);
-                    }
-                    if (check_user.user_id === user_id) {
-                        throw new Error(index_2.Errors.USER_POST_OWN_FEEDBACK);
-                    }
-                    feedback_info.user_id = check_user.user_id;
+                let feedback_info = { name, feedback, posted_by: user.email };
+                const check_user = yield index_1.userService.checkUserExist("email", email);
+                if (check_user.error) {
+                    throw new Error(check_user.error);
                 }
-                else {
-                    const check_technology = yield index_1.technologyService.checkTechnologyExist("name", name);
-                    if (check_technology.error) {
-                        throw new Error(check_technology.error);
-                    }
-                    feedback_info.technology_id = check_technology.technology_id;
+                if (check_user.user_id === user_id) {
+                    throw new Error(index_2.Errors.USER_POST_OWN_FEEDBACK);
                 }
+                feedback_info.user_id = check_user.user_id;
+                const result = yield index_1.feedbackService.addFeedback(feedback_info);
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+                res.status(201);
+                res.send(result);
+            }
+            catch (e) {
+                console.log(e.message);
+                res.status(400);
+                res.send({ error: e.message });
+            }
+        });
+    }
+    postTechnologyFeedback(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user_id = req.body.user_id;
+                const feedback = req.body.feedback;
+                let name = req.body.name;
+                const user = yield index_1.userService.checkUserExist("user_id", user_id);
+                if (user.error) {
+                    throw new Error(user.error);
+                }
+                if (user.roles === "admin") {
+                    throw new Error(index_2.Errors.ADMIN_POST_FEEDBACK);
+                }
+                let feedback_info = { name, feedback, posted_by: user.email };
+                const technology = yield index_1.technologyService.checkTechnologyExist("name", name);
+                if (technology.error) {
+                    throw new Error(technology.error);
+                }
+                feedback_info.technology_id = technology.technology_id;
                 const result = yield index_1.feedbackService.addFeedback(feedback_info);
                 if (result.error) {
                     throw new Error(result.error);

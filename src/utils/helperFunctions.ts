@@ -77,16 +77,18 @@ export class HelperFunctions{
 
         return new Date(parseInt(year),parseInt(month),parseInt(day));
     }
-    
+
     removeSensitiveData(data: Array<any>){
-      for(let i of data){
-          if(i.password){
-              delete i.password;
-          }
-          if(i._id){
-              delete i._id;
-          }
-      }
-      return data;
+        if(data){
+            for(let i of data){
+                if(i.password){
+                    delete i.password;
+                }
+                if(i._id){
+                    delete i._id;
+                }
+            }
+        }    
+        return data;
     }
 }

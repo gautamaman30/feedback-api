@@ -12,15 +12,15 @@ export default class FeedbackController{
             const sort: any = req.query.sort;
 
 
-            let feedbacks: any;
+            let feedbacks: any = [];
+
             if(feedback_id) {
                 const feedback: any = await feedbackService.checkFeedbackExist("feedback_id", feedback_id);
                 if(feedback.error) {
                     throw new Error(feedback.error);
                 }
-                feedbacks = feedback;
-            }
-            else if(filter || sort) {
+                feedbacks[0] = feedback;
+            } else if(filter || sort) {
                 const queryMapping = {
                     "date": "created_on",
                     "user": "user_id",
@@ -37,6 +37,8 @@ export default class FeedbackController{
                 if(sort){
                     feedbacks = await feedbackService.getFeedbacksSorted(queryMapping[sort]);
                 }
+            } else {
+                feedbacks = await feedbackService.getAllFeedbacks();
             }
 
             let user: any = await userService.checkUserExist("user_id", user_id);
@@ -46,6 +48,7 @@ export default class FeedbackController{
             if(user.roles !== "admin"){
                 feedbacks = feedbackService.filterFeedback(feedbacks, "status", ["approved"]);
             }
+
             feedbacks = helperFunctions.removeSensitiveData(feedbacks);
 
             res.status(200);
@@ -89,7 +92,7 @@ export default class FeedbackController{
         }
     }
 
-    async postFeedback(req: Request, res: Response){
+    async postUserFeedback(req: Request, res: Response){
         try{
             const user_id: string = req.body.user_id;
             const feedback: string = req.body.feedback;
@@ -104,31 +107,59 @@ export default class FeedbackController{
                 throw new Error(Errors.ADMIN_POST_FEEDBACK);
             }
 
-            let feedback_info: any = {name, feedback, posted_by: user_id};
+            let feedback_info: any = {name, feedback, posted_by: user.email};
 
-            if(email){
-                const check_user: any = await userService.checkUserExist("email", email);
-                if(check_user.error){
-                    throw new Error(check_user.error);
-                }
-                if(check_user.user_id === user_id) {
-                    throw new Error(Errors.USER_POST_OWN_FEEDBACK)
-                }
-                feedback_info.user_id = check_user.user_id;
+            const check_user: any = await userService.checkUserExist("email", email);
+            if(check_user.error){
+                throw new Error(check_user.error);
             }
-            else{
-                const check_technology: any = await technologyService.checkTechnologyExist("name", name);
-                if(check_technology.error) {
-                    throw new Error(check_technology.error);
-                }
-                feedback_info.technology_id = check_technology.technology_id;
+            if(check_user.user_id === user_id) {
+                throw new Error(Errors.USER_POST_OWN_FEEDBACK)
             }
+            feedback_info.user_id = check_user.user_id;
 
             const result: any = await feedbackService.addFeedback(feedback_info);
             if(result.error) {
                  throw new Error(result.error);
             }
-            
+
+            res.status(201);
+            res.send(result);
+        } catch(e){
+            console.log(e.message);
+            res.status(400);
+            res.send({error: e.message});
+        }
+    }
+
+    async postTechnologyFeedback(req: Request, res: Response){
+        try{
+            const user_id: string = req.body.user_id;
+            const feedback: string = req.body.feedback;
+            let name: string = req.body.name;
+
+            const user: any = await userService.checkUserExist("user_id", user_id);
+            if(user.error) {
+                throw new Error(user.error);
+            }
+            if(user.roles === "admin"){
+                throw new Error(Errors.ADMIN_POST_FEEDBACK);
+            }
+
+            let feedback_info: any = {name, feedback, posted_by: user.email};
+
+            const technology: any = await technologyService.checkTechnologyExist("name", name);
+            if(technology.error) {
+                throw new Error(technology.error);
+            }
+            feedback_info.technology_id = technology.technology_id;
+
+
+            const result: any = await feedbackService.addFeedback(feedback_info);
+            if(result.error) {
+                 throw new Error(result.error);
+            }
+
             res.status(201);
             res.send(result);
         } catch(e){

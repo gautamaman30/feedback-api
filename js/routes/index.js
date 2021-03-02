@@ -27,15 +27,19 @@ class RoutesHandler {
         //Feedback routes
         this.router.route('/feedback')
             .get(index_1.feedbackValidator.getFeedbacks, index_2.feedbackController.getFeedbacks)
-            .post(index_1.feedbackValidator.postFeedback, index_2.feedbackController.postFeedback)
             .delete(index_1.feedbackValidator.deleteFeedback, index_2.feedbackController.deleteFeedback)
             .put(index_1.feedbackValidator.updateFeedback, index_2.feedbackController.updateFeedback);
         // change feedback status
         this.router.put('/feedback/status', index_1.feedbackValidator.updateFeedbackStatus, index_2.feedbackController.updateFeedbackStatus);
         //add user count for a feedback
         this.router.put('/feedback/count', index_1.feedbackValidator.updateFeedbackCount, index_2.feedbackController.updateFeedbackCount);
-        //get all feedbacks posted by a user
-        this.router.get('/user/feedbacks', index_1.feedbackValidator.getFeedbacksByUser, index_2.feedbackController.getFeedbacksByUser);
+        //get all feedbacks posted by a user and post feedback for a user
+        this.router.route('/user/feedback')
+            .get(index_1.feedbackValidator.getFeedbacksByUser, index_2.feedbackController.getFeedbacksByUser)
+            .post(index_1.feedbackValidator.postUserFeedback, index_2.feedbackController.postUserFeedback);
+        //post feedback for a technology
+        this.router.route('/technology/feedback')
+            .post(index_1.feedbackValidator.postTechnologyFeedback, index_2.feedbackController.postTechnologyFeedback);
         return this.router;
     }
 }

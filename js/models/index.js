@@ -32,7 +32,7 @@ class Database {
                 const sortQuery = {};
                 sortQuery[sortField] = -1;
                 const db = yield getDb();
-                const result = yield db.collection("feedbacks").find(query).sort(sortQuery);
+                const result = yield db.collection("feedbacks").find(query).sort(sortQuery).toArray();
                 return result;
             }
             catch (e) {
@@ -49,7 +49,8 @@ class Database {
                 const sortQuery = {};
                 sortQuery[sortField] = -1;
                 const db = yield getDb();
-                const result = yield db.collection("feedbacks").find(filterQuery).sort(sortQuery);
+                let result = yield db.collection("feedbacks").find(filterQuery);
+                result = yield result.sort(sortField).toArray();
                 return result;
             }
             catch (e) {
@@ -62,7 +63,7 @@ class Database {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const db = yield getDb();
-                const result = yield db.collection("feedbacks").find(query);
+                const result = yield db.collection("feedbacks").find(query).toArray();
                 return result;
             }
             catch (e) {
@@ -77,7 +78,7 @@ class Database {
                 let filterQuery = {};
                 filterQuery[query] = { $exists: true };
                 const db = yield getDb();
-                const result = yield db.collection("feedbacks").find(filterQuery);
+                const result = yield db.collection("feedbacks").find(filterQuery).toArray();
                 return result;
             }
             catch (e) {

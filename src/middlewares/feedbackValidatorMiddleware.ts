@@ -54,7 +54,7 @@ export class FeedbackValidator{
             })
     }
 
-    postFeedback(req: Request, res: Response, next: NextFunction){
+    postUserFeedback(req: Request, res: Response, next: NextFunction){
         let feedbackSchema = object({
             name: string().required().trim().lowercase().min(3).max(50).matches(/^[a-z]+$/),
             email: string().email().required().trim().max(100),
@@ -81,7 +81,33 @@ export class FeedbackValidator{
               let error = helperFunctions.capitalizeString(err.errors);
               res.send({error});
             })
-      }
+    }
+
+    postTechnologyFeedback(req: Request, res: Response, next: NextFunction){
+        let feedbackSchema = object({
+            name: string().required().trim().lowercase().min(3).max(50).matches(/^[a-z]+$/),
+            feedback: string().required().trim().min(10).max(200)
+        });
+
+        let feedback_info: any = {
+            name: req.body.name,
+            feedback: req.body.feedback
+        };
+
+        feedbackSchema.validate(feedback_info)
+            .then((result) => {
+              console.log(result);
+              req.body.name = result.name;
+              req.body.feedback = result.feedback;
+
+              return next();
+            }).catch(err => {
+              console.log(err);
+              res.status(400);
+              let error = helperFunctions.capitalizeString(err.errors);
+              res.send({error});
+            })
+    }
 
     updateFeedback(req: Request, res: Response, next: NextFunction){
         let feedbackSchema = object({
