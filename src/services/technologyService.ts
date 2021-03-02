@@ -19,13 +19,16 @@ export default class TechnologyService{
             console.log(err);
             return {error: Errors.INTERNAL_ERROR};
         }
-    } 
+    }
 
-  
+
 
     async editTechnology(technology_info: {name: string, details: string}){
         try{
-            const result = await database.updateTechnology({ name: technology_info.name }, { details: technology_info.details });
+            let filter: any = { name: technology_info.name };
+            let updateDoc: any = { details: technology_info.details };
+
+            const result = await database.updateTechnology(filter, updateDoc);
 
             if(result.error){
                 throw new Error(Errors.INTERNAL_ERROR);
@@ -40,7 +43,7 @@ export default class TechnologyService{
         }
     }
 
-    
+
     async removeTechnology(technology_info: {name: string}){
 
         try{
@@ -59,13 +62,13 @@ export default class TechnologyService{
         }
     }
 
-  
+
 
     async checkTechnologyExist(key: string, value: any){
         try{
             let technology_info: any = {};
             technology_info[key] = value;
-           
+
             const result = await database.findTechnology(technology_info);
 
             if(!result){
@@ -81,7 +84,7 @@ export default class TechnologyService{
         }
     }
 
-   
+
     async addTechnology(technology_info: {name: string, details?: string}){
         try{
             let technology: any;
@@ -101,8 +104,8 @@ export default class TechnologyService{
         } catch(err) {
             console.log(err);
             return {error: err.message};
-        }   
+        }
     }
 
-   
+
 }

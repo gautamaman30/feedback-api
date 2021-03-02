@@ -7,4 +7,5 @@ export declare const Messages: {
     TECHNOLOGY_CREATED: string;
     USER_DELETED: string;
     USER_CREATED: string;
+    USER_UPDATED: string;
 };

@@ -19,10 +19,9 @@ export default class FeedbackService{
         }
     }
 
-    async getFeedbacks(filter){
+    async getFeedbacks(feedback_info){
         try{
-            let query: any = filter;
-            const result = await database.findFeedbacks(query);
+            const result = await database.findFeedbacks(feedback_info);
             if(result.error){
                 throw new Error(Errors.INTERNAL_ERROR);
             }
@@ -33,20 +32,16 @@ export default class FeedbackService{
         }
     }
 
-    async getFilteredAndSortedFeedbacks(filter, sort){
+    async getFeedbacksFilteredAndSorted(filter, sort){
         try{
-            let query: any = {};
+            let result: any;
             if(filter === "status"){
-                query[filter] = "approved";
+                result = await database.findFeedbacksSorted({"status": "approved"}, sort);
             }
-            else{
-                query[filter] = { '$exists': true};
+            else {
+                result = await database.findFeedbacksByKeySorted(filter, sort);
             }
 
-            let sortField: any = {};
-            sortField[sort] = -1;
-
-            const result = await database.findFeedbacksSorted(query, sortField);
             if(result.error){
                 throw new Error(Errors.INTERNAL_ERROR);
             }
@@ -57,12 +52,9 @@ export default class FeedbackService{
         }
     }
 
-    async getSortedFeedbacks(sort){
+    async getFeedbacksSorted(sort){
         try{
-            let sortField: any = {};
-            sortField[sort] = -1;
-
-            const result = await database.findFeedbacksSorted({}, sortField);
+            const result = await database.findFeedbacksSorted({}, sort);
             if(result.error){
                 throw new Error(Errors.INTERNAL_ERROR);
             }
@@ -74,16 +66,16 @@ export default class FeedbackService{
         }
     }
 
-    async getFilteredFeedbacks(filter){
+    async getFeedbacksFiltered(filter){
         try{
-            let query: any = {};
+            let result: any;
             if(filter === "status"){
-                query[filter] = "approved";
+                result = await database.findFeedbacks({"status": "approved"});
             }
-            else{
-                query[filter] = { '$exists': true};
+            else {
+                result = await database.findFeedbacksByKey(filter);
             }
-            const result = await database.findFeedbacks(query);
+
             if(result.error){
                 throw new Error(Errors.INTERNAL_ERROR);
             }
@@ -97,7 +89,7 @@ export default class FeedbackService{
     async editFeedbackStatus(feedback_info: {feedback_id: string, status: "approved" | "rejected"}){
 
         try{
-            const result = await database.updateFeedback({ feedback_id: feedback_info.feedback_id }, { $set: {status: feedback_info.status }});
+            const result = await database.updateFeedback({ feedback_id: feedback_info.feedback_id }, {status: feedback_info.status });
 
             if(result.error){
                 throw new Error(Errors.INTERNAL_ERROR);
@@ -115,7 +107,7 @@ export default class FeedbackService{
     async editFeedbackCount(feedback_info: {feedback_id: string, count_users: string}){
 
         try{
-            const result = await database.updateFeedback({ feedback_id: feedback_info.feedback_id }, { $push : { count_users: feedback_info.count_users }, $inc: {count: 1}});
+            const result = await database.updateFeedbackCount({ feedback_id: feedback_info.feedback_id }, { count_users: feedback_info.count_users });
 
             if(result.error){
                 throw new Error(Errors.INTERNAL_ERROR);
@@ -132,7 +124,7 @@ export default class FeedbackService{
 
     async editFeedback(feedback_info: {feedback_id: string, feedback: string}){
         try{
-            const result = await database.updateFeedback({ feedback_id: feedback_info.feedback_id }, { $set: {feedback: feedback_info.feedback }});
+            const result = await database.updateFeedback({ feedback_id: feedback_info.feedback_id },  {feedback: feedback_info.feedback });
 
             if(result.error){
                 throw new Error(Errors.INTERNAL_ERROR);

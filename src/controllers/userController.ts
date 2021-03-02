@@ -21,13 +21,15 @@ export default class UserController{
                 if(result.error) throw new Error(result.error);
             }
             else if(name){
-                result = await userService.getUsers("name", name.toLowerCase());
+                result = await userService.getUsers("name", name);
                 if(result.error) throw new Error(result.error);
             }
             else{
                 result = await userService.getAllUsers();
                 if(result.error) throw new Error(result.error);
             }
+            result = helperFunctions.removeSensitiveData(result);
+
             res.status(200);
             res.send(result);
         } catch(e){
@@ -45,7 +47,6 @@ export default class UserController{
             let title: string = req.body.title;
             let date_of_birth: Date = req.body.date_of_birth;
 
-
             const admin: any = await userService.checkAdminExist("user_id", admin_id);
             if(admin.error) {
                 throw new Error(admin.error);
@@ -59,12 +60,7 @@ export default class UserController{
                 throw new Error(Errors.DUPLICATE_EMAIL);
             }
 
-            name = name.toLowerCase();
-
-            let password: string = helperFunctions.generateRandomPassword();
-            password = await helperFunctions.hashPassword(password);
-
-            let user_info: any = {name, email, password, title, date_of_birth};
+            let user_info: any = {name, email, title, date_of_birth};
 
             let result = await userService.addUser(user_info);
             if(result.error) {
@@ -78,7 +74,6 @@ export default class UserController{
             });
 
             res.set("payload", payload);
-            res.set("password", password);
             res.status(201);
             return next();
         } catch(e){
@@ -144,6 +139,41 @@ export default class UserController{
             if(result.error) {
                 throw new Error(result.error);
             }
+            res.status(200);
+            res.send(result);
+        } catch(e){
+            console.log(e.message);
+            res.status(400);
+            res.send({error: e.message});
+        }
+    }
+
+    async updateUser(req: Request, res: Response, next: NextFunction){
+        try{
+            const user_id: string = req.body.user_id;
+            let password: string = req.body.password;
+            let title: string = req.body.title;
+            let date_of_birth: Date = req.body.date_of_birth;
+
+
+            const user: any = await userService.checkUserExist("user_id", user_id);
+            if(user.error) {
+                throw new Error(user.error);
+            }
+            if(user.roles === "admin") {
+                throw new Error(Errors.ADMIN_EDIT_USER);
+            }
+            if(!(password || title || date_of_birth)){
+                throw new Error(Errors.USER_UPDATE_FIELD_REQUIRED)
+            }
+
+            let user_info: any = {email: user.email, password, title, date_of_birth};
+
+            let result = await userService.editUser(user_info);
+            if(result.error) {
+                throw new Error(result.error);
+            }
+
             res.status(200);
             res.send(result);
         } catch(e){

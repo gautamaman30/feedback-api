@@ -28,11 +28,10 @@ class FeedbackService {
             }
         });
     }
-    getFeedbacks(filter) {
+    getFeedbacks(feedback_info) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let query = filter;
-                const result = yield database.findFeedbacks(query);
+                const result = yield database.findFeedbacks(feedback_info);
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }
@@ -44,19 +43,16 @@ class FeedbackService {
             }
         });
     }
-    getFilteredAndSortedFeedbacks(filter, sort) {
+    getFeedbacksFilteredAndSorted(filter, sort) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let query = {};
+                let result;
                 if (filter === "status") {
-                    query[filter] = "approved";
+                    result = yield database.findFeedbacksSorted({ "status": "approved" }, sort);
                 }
                 else {
-                    query[filter] = { '$exists': true };
+                    result = yield database.findFeedbacksByKeySorted(filter, sort);
                 }
-                let sortField = {};
-                sortField[sort] = -1;
-                const result = yield database.findFeedbacksSorted(query, sortField);
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }
@@ -68,12 +64,10 @@ class FeedbackService {
             }
         });
     }
-    getSortedFeedbacks(sort) {
+    getFeedbacksSorted(sort) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let sortField = {};
-                sortField[sort] = -1;
-                const result = yield database.findFeedbacksSorted({}, sortField);
+                const result = yield database.findFeedbacksSorted({}, sort);
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }
@@ -85,17 +79,16 @@ class FeedbackService {
             }
         });
     }
-    getFilteredFeedbacks(filter) {
+    getFeedbacksFiltered(filter) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let query = {};
+                let result;
                 if (filter === "status") {
-                    query[filter] = "approved";
+                    result = yield database.findFeedbacks({ "status": "approved" });
                 }
                 else {
-                    query[filter] = { '$exists': true };
+                    result = yield database.findFeedbacksByKey(filter);
                 }
-                const result = yield database.findFeedbacks(query);
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }
@@ -110,7 +103,7 @@ class FeedbackService {
     editFeedbackStatus(feedback_info) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield database.updateFeedback({ feedback_id: feedback_info.feedback_id }, { $set: { status: feedback_info.status } });
+                const result = yield database.updateFeedback({ feedback_id: feedback_info.feedback_id }, { status: feedback_info.status });
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }
@@ -128,7 +121,7 @@ class FeedbackService {
     editFeedbackCount(feedback_info) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield database.updateFeedback({ feedback_id: feedback_info.feedback_id }, { $push: { count_users: feedback_info.count_users }, $inc: { count: 1 } });
+                const result = yield database.updateFeedbackCount({ feedback_id: feedback_info.feedback_id }, { count_users: feedback_info.count_users });
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }
@@ -146,7 +139,7 @@ class FeedbackService {
     editFeedback(feedback_info) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield database.updateFeedback({ feedback_id: feedback_info.feedback_id }, { $set: { feedback: feedback_info.feedback } });
+                const result = yield database.updateFeedback({ feedback_id: feedback_info.feedback_id }, { feedback: feedback_info.feedback });
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }

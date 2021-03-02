@@ -9,5 +9,6 @@ exports.Messages = {
     TECHNOLOGY_UPDATED: "Technology updated successfully",
     TECHNOLOGY_CREATED: "Technology created successfully",
     USER_DELETED: "User deleted successfully",
-    USER_CREATED: "User created successfully"
+    USER_CREATED: "User created successfully",
+    USER_UPDATED: "User updated successfully"
 };

@@ -29,8 +29,27 @@ class Database {
     findFeedbacksSorted(query, sortField) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const sortQuery = {};
+                sortQuery[sortField] = -1;
                 const db = yield getDb();
-                const result = yield db.collection("feedbacks").find(query).sort(sortField);
+                const result = yield db.collection("feedbacks").find(query).sort(sortQuery);
+                return result;
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+        });
+    }
+    findFeedbacksByKeySorted(query, sortField) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let filterQuery = {};
+                filterQuery[query] = { $exists: true };
+                const sortQuery = {};
+                sortQuery[sortField] = -1;
+                const db = yield getDb();
+                const result = yield db.collection("feedbacks").find(filterQuery).sort(sortQuery);
                 return result;
             }
             catch (e) {
@@ -52,11 +71,62 @@ class Database {
             }
         });
     }
+    findFeedbacksByKey(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let filterQuery = {};
+                filterQuery[query] = { $exists: true };
+                const db = yield getDb();
+                const result = yield db.collection("feedbacks").find(filterQuery);
+                return result;
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+        });
+    }
     updateFeedback(filter, update) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const updateDoc = {
+                    $set: update
+                };
                 const db = yield getDb();
-                const result = yield db.collection('feedbacks').updateOne(filter, update);
+                const result = yield db.collection('feedbacks').updateOne(filter, updateDoc);
+                return result;
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+        });
+    }
+    updateFeedbackCount(filter, update) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const updateDoc = {
+                    $push: update,
+                    $inc: { "count": 1 }
+                };
+                const db = yield getDb();
+                const result = yield db.collection('feedbacks').updateOne(filter, updateDoc);
+                return result;
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+        });
+    }
+    updateUser(filter, update) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const updateDoc = {
+                    $set: update
+                };
+                const db = yield getDb();
+                const result = yield db.collection('users').updateOne(filter, updateDoc);
                 return result;
             }
             catch (e) {

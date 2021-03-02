@@ -30,7 +30,7 @@ class UserController {
                         throw new Error(result.error);
                 }
                 else if (name) {
-                    result = yield index_1.userService.getUsers("name", name.toLowerCase());
+                    result = yield index_1.userService.getUsers("name", name);
                     if (result.error)
                         throw new Error(result.error);
                 }
@@ -39,6 +39,7 @@ class UserController {
                     if (result.error)
                         throw new Error(result.error);
                 }
+                result = index_2.helperFunctions.removeSensitiveData(result);
                 res.status(200);
                 res.send(result);
             }
@@ -68,10 +69,7 @@ class UserController {
                 if (user.user_id) {
                     throw new Error(index_2.Errors.DUPLICATE_EMAIL);
                 }
-                name = name.toLowerCase();
-                let password = index_2.helperFunctions.generateRandomPassword();
-                password = yield index_2.helperFunctions.hashPassword(password);
-                let user_info = { name, email, password, title, date_of_birth };
+                let user_info = { name, email, title, date_of_birth };
                 let result = yield index_1.userService.addUser(user_info);
                 if (result.error) {
                     throw new Error(result.error);
@@ -82,7 +80,6 @@ class UserController {
                     email: result.email
                 });
                 res.set("payload", payload);
-                res.set("password", password);
                 res.status(201);
                 return next();
             }
@@ -142,6 +139,38 @@ class UserController {
                     throw new Error(index_2.Errors.ADMIN_DELETE_ADMIN);
                 }
                 const result = yield index_1.userService.removeUser({ email });
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+                res.status(200);
+                res.send(result);
+            }
+            catch (e) {
+                console.log(e.message);
+                res.status(400);
+                res.send({ error: e.message });
+            }
+        });
+    }
+    updateUser(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user_id = req.body.user_id;
+                let password = req.body.password;
+                let title = req.body.title;
+                let date_of_birth = req.body.date_of_birth;
+                const user = yield index_1.userService.checkUserExist("user_id", user_id);
+                if (user.error) {
+                    throw new Error(user.error);
+                }
+                if (user.roles === "admin") {
+                    throw new Error(index_2.Errors.ADMIN_EDIT_USER);
+                }
+                if (!(password || title || date_of_birth)) {
+                    throw new Error(index_2.Errors.USER_UPDATE_FIELD_REQUIRED);
+                }
+                let user_info = { email: user.email, password, title, date_of_birth };
+                let result = yield index_1.userService.editUser(user_info);
                 if (result.error) {
                     throw new Error(result.error);
                 }

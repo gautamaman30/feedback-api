@@ -17,9 +17,9 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const errorsUtils_1 = require("./errorsUtils");
 class HelperFunctions {
     generateRandomPassword() {
-        const str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const str = "0123456789";
         let password = '';
-        while (password.length < 12) {
+        while (password.length < 8) {
             let tempChar = Math.floor(Math.random() * str.length);
             password += str[tempChar];
         }
@@ -79,19 +79,28 @@ class HelperFunctions {
         return id;
     }
     convertStringToDate(date) {
+        let currentYear = (new Date()).getFullYear();
         let month_date = { 1: 31, 2: 28 | 29, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30, 10: 31, 11: 30, 12: 31 };
-        let arr = date.split('-');
-        if (arr.length !== 3)
+        let arr = date.split('/');
+        let [month, day, year] = [...arr];
+        if (parseInt(year) > currentYear - 18)
             return null;
-        if (!(arr[0].length === 4 && parseInt(arr[0])))
+        if (parseInt(month) >= 13)
             return null;
-        if (!(arr[1].length === 2 && parseInt(arr[1]) && (parseInt(arr[1]) < 13)))
+        if (parseInt(day) <= 0 || parseInt(day) > month_date[parseInt(month)])
             return null;
-        if (!(arr[2].length === 2 && parseInt(arr[2])))
-            return null;
-        if (!(month_date[parseInt(arr[1])] === parseInt(arr[2])))
-            return null;
-        return new Date(parseInt(arr[0]), parseInt(arr[1]), parseInt(arr[2]));
+        return new Date(parseInt(year), parseInt(month), parseInt(day));
+    }
+    removeSensitiveData(data) {
+        for (let i of data) {
+            if (i.password) {
+                delete i.password;
+            }
+            if (i._id) {
+                delete i._id;
+            }
+        }
+        return data;
     }
 }
 exports.HelperFunctions = HelperFunctions;

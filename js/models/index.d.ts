@@ -1,8 +1,12 @@
 export declare class Database {
     findAll(collectionName: string): Promise<any>;
     findFeedbacksSorted(query: any, sortField: any): Promise<any>;
+    findFeedbacksByKeySorted(query: any, sortField: any): Promise<any>;
     findFeedbacks(query: any): Promise<any>;
+    findFeedbacksByKey(query: any): Promise<any>;
     updateFeedback(filter: any, update: any): Promise<any>;
+    updateFeedbackCount(filter: any, update: any): Promise<any>;
+    updateUser(filter: any, update: any): Promise<any>;
     updateTechnology(filter: any, update: any): Promise<any>;
     deleteFeedback(query: any): Promise<any>;
     deleteTechnology(query: any): Promise<any>;

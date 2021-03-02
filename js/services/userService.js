@@ -20,7 +20,6 @@ class UserService {
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }
-                result = result.filter(item => !item.admin_key);
                 return result;
             }
             catch (err) {
@@ -114,20 +113,59 @@ class UserService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let user;
+                let password = index_2.helperFunctions.generateRandomPassword();
+                let hashedPassword = yield index_2.helperFunctions.hashPassword(password);
                 user = {
                     user_id: index_2.helperFunctions.generateId(),
                     name: user_info.name,
-                    email: user_info.email
+                    email: user_info.email,
+                    password: hashedPassword,
+                    roles: "employee"
                 };
                 if (user_info.title)
                     user.title = user_info.title;
-                if (user_info.date_of_birth)
-                    user.date_of_birth = user_info.date_of_birth;
+                if (user_info.date_of_birth) {
+                    let date_of_birth = index_2.helperFunctions.convertStringToDate(user_info.date_of_birth);
+                    console.log(date_of_birth);
+                    if (date_of_birth) {
+                        user.date_of_birth = date_of_birth;
+                    }
+                }
                 const result = yield database.insertUser(user);
                 if (result.error || result.insertedCount < 1) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }
+                user.password = password;
                 return user;
+            }
+            catch (err) {
+                console.log(err);
+                return { error: err.message };
+            }
+        });
+    }
+    editUser(user_info) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let update = {};
+                if (user_info.password) {
+                    update.password = yield index_2.helperFunctions.hashPassword(user_info.password);
+                }
+                if (user_info.title) {
+                    update.title = user_info.title;
+                }
+                if (user_info.date_of_birth) {
+                    let date_of_birth = index_2.helperFunctions.convertStringToDate(user_info.date_of_birth);
+                    if (date_of_birth) {
+                        update.date_of_birth = date_of_birth;
+                    }
+                }
+                let filter = { email: user_info.email };
+                const result = yield database.updateUser(filter, update);
+                if (result.error || result.insertedCount < 1) {
+                    throw new Error(index_2.Errors.INTERNAL_ERROR);
+                }
+                return { message: index_2.Messages.USER_UPDATED };
             }
             catch (err) {
                 console.log(err);

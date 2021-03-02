@@ -18,12 +18,13 @@ export class RoutesHandler{
         this.router.post('/user/login', userValidator.loginUser, userController.loginUser, authMiddleware.signToken);
 
         this.router.use('/', authMiddleware.verifyToken);
-        
+
         //User routes
         this.router.route('/user')
             .get(userController.getUser)
             .post(userValidator.postUser, userController.postUser, authMiddleware.signToken)
-            .delete(userValidator.deleteUser, userController.deleteUser);
+            .delete(userValidator.deleteUser, userController.deleteUser)
+            .put(userValidator.updateUser, userController.updateUser);
 
 
         //Technology routes
@@ -36,7 +37,7 @@ export class RoutesHandler{
 
         //Feedback routes
         this.router.route('/feedback')
-            .get(feedbackController.getFeedbacks)
+            .get(feedbackValidator.getFeedbacks, feedbackController.getFeedbacks)
             .post(feedbackValidator.postFeedback, feedbackController.postFeedback)
             .delete(feedbackValidator.deleteFeedback, feedbackController.deleteFeedback)
             .put(feedbackValidator.updateFeedback, feedbackController.updateFeedback);
@@ -48,7 +49,7 @@ export class RoutesHandler{
         this.router.put('/feedback/count', feedbackValidator.updateFeedbackCount, feedbackController.updateFeedbackCount);
 
         //get all feedbacks posted by a user
-        this.router.get('/user/feedbacks', feedbackValidator.getFeedback, feedbackController.getFeedbacksByUser);
+        this.router.get('/user/feedbacks', feedbackValidator.getFeedbacksByUser, feedbackController.getFeedbacksByUser);
 
 
         return this.router;

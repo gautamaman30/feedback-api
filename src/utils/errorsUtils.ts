@@ -6,6 +6,7 @@ export const Errors = {
     ADMIN_DELETE_ADMIN : "Admin cannot delete another admin",
     ADMIN_NOT_FOUND : "Admin not found",
     NOT_ADMIN: "User is not authorized as admin",
+    ADMIN_EDIT_USER: "Admin cannot edit user details",
 
 
     USER_NAME_REQUIRED : "User name is required",
@@ -15,6 +16,7 @@ export const Errors = {
     USER_EDIT_OTHERS_FEEDBACK : "User cannot update other user's feedbacks",
     DUPLICATE_EMAIL : "User with this email already exists",
     USER_NOT_FOUND : "User not found",
+    USER_UPDATE_FIELD_REQUIRED: "Updates field cannot be empty",
 
     TECHNOLOGY_NAME_REQUIRED : "Technology name is required",
     TECHNOLOGY_DETAILS_REQUIRED : "Technology details is required",

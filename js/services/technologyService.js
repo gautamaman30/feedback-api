@@ -31,7 +31,9 @@ class TechnologyService {
     editTechnology(technology_info) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield database.updateTechnology({ name: technology_info.name }, { details: technology_info.details });
+                let filter = { name: technology_info.name };
+                let updateDoc = { details: technology_info.details };
+                const result = yield database.updateTechnology(filter, updateDoc);
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
                 }

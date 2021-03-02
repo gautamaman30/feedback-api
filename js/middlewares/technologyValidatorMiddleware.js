@@ -16,6 +16,8 @@ class TechnologyValidator {
         technologySchema.validate(technology_info)
             .then((result) => {
             console.log(result);
+            req.body.name = result.name;
+            req.body.details = result.details;
             return next();
         }).catch(err => {
             console.log(err);
@@ -34,6 +36,7 @@ class TechnologyValidator {
         technologySchema.validate(technology_info)
             .then((result) => {
             console.log(result);
+            req.body.name = result.name;
             return next();
         }).catch(err => {
             console.log(err);

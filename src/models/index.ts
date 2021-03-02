@@ -17,8 +17,29 @@ export class Database{
 
     async findFeedbacksSorted(query, sortField){
         try{
+
+            const sortQuery = {};
+            sortQuery[sortField] = -1;
+
             const db = await getDb();
-            const result = await db.collection("feedbacks").find(query).sort(sortField);
+            const result = await db.collection("feedbacks").find(query).sort(sortQuery);
+            return result;
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+    }
+
+    async findFeedbacksByKeySorted(query, sortField){
+        try{
+            let filterQuery: any = {};
+            filterQuery[query] = { $exists: true };
+
+            const sortQuery = {};
+            sortQuery[sortField] = -1;
+
+            const db = await getDb();
+            const result = await db.collection("feedbacks").find(filterQuery).sort(sortQuery);
             return result;
         } catch(e){
             console.log(e);
@@ -37,10 +58,56 @@ export class Database{
         }
     }
 
+    async findFeedbacksByKey(query){
+        try{
+            let filterQuery: any = {};
+            filterQuery[query] = { $exists: true };
+
+            const db = await getDb();
+            const result = await db.collection("feedbacks").find(filterQuery);
+            return result;
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+    }
+
     async updateFeedback(filter, update){
         try{
+            const updateDoc = {
+                $set: update
+            }
             const db = await getDb();
-            const result = await db.collection('feedbacks').updateOne(filter, update);
+            const result = await db.collection('feedbacks').updateOne(filter, updateDoc );
+            return result;
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+    }
+
+    async updateFeedbackCount(filter, update){
+        try{
+            const updateDoc = {
+                $push: update,
+                $inc: { "count": 1}
+            }
+            const db = await getDb();
+            const result = await db.collection('feedbacks').updateOne(filter, updateDoc );
+            return result;
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+    }
+
+    async updateUser(filter, update){
+        try{
+            const updateDoc = {
+                $set: update
+            }
+            const db = await getDb();
+            const result = await db.collection('users').updateOne(filter, updateDoc);
             return result;
         } catch(e){
             console.log(e);

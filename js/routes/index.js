@@ -16,7 +16,8 @@ class RoutesHandler {
         this.router.route('/user')
             .get(index_2.userController.getUser)
             .post(index_1.userValidator.postUser, index_2.userController.postUser, index_1.authMiddleware.signToken)
-            .delete(index_1.userValidator.deleteUser, index_2.userController.deleteUser);
+            .delete(index_1.userValidator.deleteUser, index_2.userController.deleteUser)
+            .put(index_1.userValidator.updateUser, index_2.userController.updateUser);
         //Technology routes
         this.router.route('/technology')
             .get(index_2.technologyController.getTechnology)
@@ -25,7 +26,7 @@ class RoutesHandler {
             .put(index_1.technologyValidator.postAndUpdateTechnology, index_2.technologyController.updateTechnology);
         //Feedback routes
         this.router.route('/feedback')
-            .get(index_2.feedbackController.getFeedbacks)
+            .get(index_1.feedbackValidator.getFeedbacks, index_2.feedbackController.getFeedbacks)
             .post(index_1.feedbackValidator.postFeedback, index_2.feedbackController.postFeedback)
             .delete(index_1.feedbackValidator.deleteFeedback, index_2.feedbackController.deleteFeedback)
             .put(index_1.feedbackValidator.updateFeedback, index_2.feedbackController.updateFeedback);
@@ -34,7 +35,7 @@ class RoutesHandler {
         //add user count for a feedback
         this.router.put('/feedback/count', index_1.feedbackValidator.updateFeedbackCount, index_2.feedbackController.updateFeedbackCount);
         //get all feedbacks posted by a user
-        this.router.get('/user/feedbacks', index_1.feedbackValidator.getFeedback, index_2.feedbackController.getFeedbacksByUser);
+        this.router.get('/user/feedbacks', index_1.feedbackValidator.getFeedbacksByUser, index_2.feedbackController.getFeedbacksByUser);
         return this.router;
     }
 }

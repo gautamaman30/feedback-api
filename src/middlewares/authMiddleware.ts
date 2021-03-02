@@ -23,11 +23,6 @@ export class AuthMiddleware{
             }
             if(token){
               console.log(token);
-              if(res.get("password")){
-                  let password: string = res.get("password");
-                  res.set("password", '');
-                  res.send({password, token})
-              }
               res.send({token});
             }
         });

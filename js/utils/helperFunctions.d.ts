@@ -8,4 +8,5 @@ export declare class HelperFunctions {
     convertArrayToSet(arr: any): Set<unknown>;
     generateId(): string;
     convertStringToDate(date: string): Date | null;
+    removeSensitiveData(data: Array<any>): any[];
 }

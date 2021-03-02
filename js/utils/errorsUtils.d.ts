@@ -5,6 +5,7 @@ export declare const Errors: {
     ADMIN_DELETE_ADMIN: string;
     ADMIN_NOT_FOUND: string;
     NOT_ADMIN: string;
+    ADMIN_EDIT_USER: string;
     USER_NAME_REQUIRED: string;
     USER_ID_REQUIRED: string;
     USER_PASSWORD_INCORRECT: string;
@@ -12,6 +13,7 @@ export declare const Errors: {
     USER_EDIT_OTHERS_FEEDBACK: string;
     DUPLICATE_EMAIL: string;
     USER_NOT_FOUND: string;
+    USER_UPDATE_FIELD_REQUIRED: string;
     TECHNOLOGY_NAME_REQUIRED: string;
     TECHNOLOGY_DETAILS_REQUIRED: string;
     TECHNOLOGY_NOT_FOUND: string;

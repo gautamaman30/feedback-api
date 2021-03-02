@@ -16,6 +16,18 @@ export default class UserService {
         name: string;
         email: string;
         title?: string;
-        date_of_birth?: Date;
+        date_of_birth?: string;
     }): Promise<any>;
+    editUser(user_info: {
+        email: string;
+        password?: string;
+        title?: string;
+        date_of_birth?: string;
+    }): Promise<{
+        message: string;
+        error?: undefined;
+    } | {
+        error: any;
+        message?: undefined;
+    }>;
 }

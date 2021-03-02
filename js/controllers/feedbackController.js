@@ -29,20 +29,20 @@ class FeedbackController {
                 }
                 else if (filter || sort) {
                     const queryMapping = {
+                        "date": "created_on",
                         "user": "user_id",
                         "technology": "technology_id",
-                        "date": "created_on",
-                        "status": "status",
-                        "count": "count"
+                        "count": "count",
+                        "status": "status"
                     };
                     if (filter && sort) {
-                        feedbacks = yield index_1.feedbackService.getFilteredAndSortedFeedbacks(queryMapping[filter], queryMapping[sort]);
+                        feedbacks = yield index_1.feedbackService.getFeedbacksFilteredAndSorted(queryMapping[filter], queryMapping[sort]);
                     }
                     if (filter) {
-                        feedbacks = yield index_1.feedbackService.getFilteredFeedbacks(queryMapping[filter]);
+                        feedbacks = yield index_1.feedbackService.getFeedbacksFiltered(queryMapping[filter]);
                     }
                     if (sort) {
-                        feedbacks = yield index_1.feedbackService.getSortedFeedbacks(queryMapping[sort]);
+                        feedbacks = yield index_1.feedbackService.getFeedbacksSorted(queryMapping[sort]);
                     }
                 }
                 let user = yield index_1.userService.checkUserExist("user_id", user_id);
@@ -52,6 +52,7 @@ class FeedbackController {
                 if (user.roles !== "admin") {
                     feedbacks = index_1.feedbackService.filterFeedback(feedbacks, "status", ["approved"]);
                 }
+                feedbacks = index_2.helperFunctions.removeSensitiveData(feedbacks);
                 res.status(200);
                 res.send({ feedbacks });
             }
@@ -81,6 +82,7 @@ class FeedbackController {
                 if (feedbacks.error) {
                     throw new Error(feedbacks.error);
                 }
+                feedbacks = index_2.helperFunctions.removeSensitiveData(feedbacks);
                 res.status(200);
                 res.send({ feedbacks });
             }
@@ -105,7 +107,6 @@ class FeedbackController {
                 if (user.roles === "admin") {
                     throw new Error(index_2.Errors.ADMIN_POST_FEEDBACK);
                 }
-                name = name.toLowerCase();
                 let feedback_info = { name, feedback, posted_by: user_id };
                 if (email) {
                     const check_user = yield index_1.userService.checkUserExist("email", email);

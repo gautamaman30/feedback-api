@@ -24,6 +24,8 @@ export default class TechnologyController{
                 result = await technologyService.getAllTechnologies();
                 if(result.error) throw new Error(result.error);
             }
+            result = helperFunctions.removeSensitiveData(result);
+
             res.status(200);
             res.send(result);
         } catch(e){

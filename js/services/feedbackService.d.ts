@@ -1,9 +1,9 @@
 export default class FeedbackService {
     getAllFeedbacks(): Promise<any>;
-    getFeedbacks(filter: any): Promise<any>;
-    getFilteredAndSortedFeedbacks(filter: any, sort: any): Promise<any>;
-    getSortedFeedbacks(sort: any): Promise<any>;
-    getFilteredFeedbacks(filter: any): Promise<any>;
+    getFeedbacks(feedback_info: any): Promise<any>;
+    getFeedbacksFilteredAndSorted(filter: any, sort: any): Promise<any>;
+    getFeedbacksSorted(sort: any): Promise<any>;
+    getFeedbacksFiltered(filter: any): Promise<any>;
     editFeedbackStatus(feedback_info: {
         feedback_id: string;
         status: "approved" | "rejected";

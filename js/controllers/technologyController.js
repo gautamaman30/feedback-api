@@ -33,6 +33,7 @@ class TechnologyController {
                     if (result.error)
                         throw new Error(result.error);
                 }
+                result = index_2.helperFunctions.removeSensitiveData(result);
                 res.status(200);
                 res.send(result);
             }

@@ -21,21 +21,21 @@ export default class FeedbackController{
                 feedbacks = feedback;
             }
             else if(filter || sort) {
-                const queryMapping: any = {
+                const queryMapping = {
+                    "date": "created_on",
                     "user": "user_id",
                     "technology": "technology_id",
-                    "date": "created_on",
-                    "status": "status",
-                    "count": "count"
+                    "count": "count",
+                    "status": "status"
                 }
                 if(filter && sort) {
-                    feedbacks = await feedbackService.getFilteredAndSortedFeedbacks(queryMapping[filter], queryMapping[sort]);
+                    feedbacks = await feedbackService.getFeedbacksFilteredAndSorted(queryMapping[filter], queryMapping[sort]);
                 }
                 if(filter){
-                    feedbacks = await feedbackService.getFilteredFeedbacks(queryMapping[filter]);
+                    feedbacks = await feedbackService.getFeedbacksFiltered(queryMapping[filter]);
                 }
                 if(sort){
-                    feedbacks = await feedbackService.getSortedFeedbacks(queryMapping[sort]);
+                    feedbacks = await feedbackService.getFeedbacksSorted(queryMapping[sort]);
                 }
             }
 
@@ -46,6 +46,7 @@ export default class FeedbackController{
             if(user.roles !== "admin"){
                 feedbacks = feedbackService.filterFeedback(feedbacks, "status", ["approved"]);
             }
+            feedbacks = helperFunctions.removeSensitiveData(feedbacks);
 
             res.status(200);
             res.send({feedbacks});
@@ -77,6 +78,7 @@ export default class FeedbackController{
             if(feedbacks.error){
                 throw new Error(feedbacks.error);
             }
+            feedbacks = helperFunctions.removeSensitiveData(feedbacks);
 
             res.status(200);
             res.send({feedbacks});
@@ -102,7 +104,6 @@ export default class FeedbackController{
                 throw new Error(Errors.ADMIN_POST_FEEDBACK);
             }
 
-            name = name.toLowerCase();
             let feedback_info: any = {name, feedback, posted_by: user_id};
 
             if(email){
@@ -127,7 +128,7 @@ export default class FeedbackController{
             if(result.error) {
                  throw new Error(result.error);
             }
-
+            
             res.status(201);
             res.send(result);
         } catch(e){
