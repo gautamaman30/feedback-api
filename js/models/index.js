@@ -15,8 +15,15 @@ const getDb = new configDb_1.ConnectDb().getDb;
 class Database {
     findAll(collectionName) {
         return __awaiter(this, void 0, void 0, function* () {
+            let db;
             try {
-                const db = yield getDb();
+                db = yield getDb();
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+            try {
                 const result = yield db.collection(`${collectionName}`).find({}).toArray();
                 return result;
             }
@@ -26,92 +33,18 @@ class Database {
             }
         });
     }
-    findFeedbacksSorted(query, sortField) {
+    insertUser(user_info) {
         return __awaiter(this, void 0, void 0, function* () {
+            let db;
             try {
-                const sortQuery = {};
-                sortQuery[sortField] = -1;
-                const db = yield getDb();
-                const result = yield db.collection("feedbacks").find(query).sort(sortQuery).toArray();
-                return result;
+                db = yield getDb();
             }
             catch (e) {
                 console.log(e);
                 return { error: e.message };
             }
-        });
-    }
-    findFeedbacksByKeySorted(query, sortField) {
-        return __awaiter(this, void 0, void 0, function* () {
             try {
-                let filterQuery = {};
-                filterQuery[query] = { $exists: true };
-                const sortQuery = {};
-                sortQuery[sortField] = -1;
-                const db = yield getDb();
-                let result = yield db.collection("feedbacks").find(filterQuery);
-                result = yield result.sort(sortField).toArray();
-                return result;
-            }
-            catch (e) {
-                console.log(e);
-                return { error: e.message };
-            }
-        });
-    }
-    findFeedbacks(query) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const db = yield getDb();
-                const result = yield db.collection("feedbacks").find(query).toArray();
-                return result;
-            }
-            catch (e) {
-                console.log(e);
-                return { error: e.message };
-            }
-        });
-    }
-    findFeedbacksByKey(query) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                let filterQuery = {};
-                filterQuery[query] = { $exists: true };
-                const db = yield getDb();
-                const result = yield db.collection("feedbacks").find(filterQuery).toArray();
-                return result;
-            }
-            catch (e) {
-                console.log(e);
-                return { error: e.message };
-            }
-        });
-    }
-    updateFeedback(filter, update) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const updateDoc = {
-                    $set: update
-                };
-                const db = yield getDb();
-                const result = yield db.collection('feedbacks').updateOne(filter, updateDoc);
-                return result;
-            }
-            catch (e) {
-                console.log(e);
-                return { error: e.message };
-            }
-        });
-    }
-    updateFeedbackCount(filter, update) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const updateDoc = {
-                    $push: update,
-                    $inc: { "count": 1 }
-                };
-                const db = yield getDb();
-                const result = yield db.collection('feedbacks').updateOne(filter, updateDoc);
+                const result = yield db.collection('users').insertOne(user_info);
                 return result;
             }
             catch (e) {
@@ -122,54 +55,19 @@ class Database {
     }
     updateUser(filter, update) {
         return __awaiter(this, void 0, void 0, function* () {
+            let db;
+            try {
+                db = yield getDb();
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
             try {
                 const updateDoc = {
                     $set: update
                 };
-                const db = yield getDb();
                 const result = yield db.collection('users').updateOne(filter, updateDoc);
-                return result;
-            }
-            catch (e) {
-                console.log(e);
-                return { error: e.message };
-            }
-        });
-    }
-    updateTechnology(filter, update) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const updateDoc = {
-                    $set: update
-                };
-                const db = yield getDb();
-                const result = yield db.collection('technologies').updateOne(filter, updateDoc);
-                return result;
-            }
-            catch (e) {
-                console.log(e);
-                return { error: e.message };
-            }
-        });
-    }
-    deleteFeedback(query) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const db = yield getDb();
-                const result = yield db.collection('feedbacks').deleteOne(query);
-                return result;
-            }
-            catch (e) {
-                console.log(e);
-                return { error: e.message };
-            }
-        });
-    }
-    deleteTechnology(query) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const db = yield getDb();
-                const result = yield db.collection('technologies').deleteOne(query);
                 return result;
             }
             catch (e) {
@@ -180,8 +78,15 @@ class Database {
     }
     deleteUser(query) {
         return __awaiter(this, void 0, void 0, function* () {
+            let db;
             try {
-                const db = yield getDb();
+                db = yield getDb();
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+            try {
                 const result = yield db.collection('users').deleteOne(query);
                 return result;
             }
@@ -193,8 +98,15 @@ class Database {
     }
     findUser(query) {
         return __awaiter(this, void 0, void 0, function* () {
+            let db;
             try {
-                const db = yield getDb();
+                db = yield getDb();
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+            try {
                 const result = yield db.collection('users').findOne(query);
                 return result;
             }
@@ -206,8 +118,15 @@ class Database {
     }
     findUsers(query) {
         return __awaiter(this, void 0, void 0, function* () {
+            let db;
             try {
-                const db = yield getDb();
+                db = yield getDb();
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+            try {
                 const result = yield db.collection('users').find(query);
                 return result;
             }
@@ -219,8 +138,15 @@ class Database {
     }
     findTechnology(query) {
         return __awaiter(this, void 0, void 0, function* () {
+            let db;
             try {
-                const db = yield getDb();
+                db = yield getDb();
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+            try {
                 const result = yield db.collection('technologies').findOne(query);
                 return result;
             }
@@ -230,11 +156,21 @@ class Database {
             }
         });
     }
-    findFeedback(query) {
+    updateTechnology(filter, update) {
         return __awaiter(this, void 0, void 0, function* () {
+            let db;
             try {
-                const db = yield getDb();
-                const result = yield db.collection('feedbacks').findOne(query);
+                db = yield getDb();
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+            try {
+                const updateDoc = {
+                    $set: update
+                };
+                const result = yield db.collection('technologies').updateOne(filter, updateDoc);
                 return result;
             }
             catch (e) {
@@ -243,11 +179,18 @@ class Database {
             }
         });
     }
-    insertUser(user_info) {
+    deleteTechnology(query) {
         return __awaiter(this, void 0, void 0, function* () {
+            let db;
             try {
-                const db = yield getDb();
-                const result = yield db.collection('users').insertOne(user_info);
+                db = yield getDb();
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+            try {
+                const result = yield db.collection('technologies').deleteOne(query);
                 return result;
             }
             catch (e) {
@@ -258,9 +201,125 @@ class Database {
     }
     insertTechnology(technology_info) {
         return __awaiter(this, void 0, void 0, function* () {
+            let db;
             try {
-                const db = yield getDb();
+                db = yield getDb();
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+            try {
                 const result = yield db.collection('technologies').insertOne(technology_info);
+                return result;
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+        });
+    }
+    findFeedback(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let db;
+            try {
+                db = yield getDb();
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+            try {
+                const result = yield db.collection('feedbacks').findOne(query);
+                return result;
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+        });
+    }
+    findFeedbacks(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let db;
+            try {
+                db = yield getDb();
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+            try {
+                const result = yield db.collection("feedbacks").find(query).toArray();
+                return result;
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+        });
+    }
+    findFeedbacksSorted(query, sortField) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let db;
+            try {
+                db = yield getDb();
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+            try {
+                const sortQuery = {};
+                sortQuery[sortField] = -1;
+                const result = yield db.collection("feedbacks").find(query).sort(sortQuery).toArray();
+                return result;
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+        });
+    }
+    updateFeedback(filter, update) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let db;
+            try {
+                db = yield getDb();
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+            try {
+                const updateDoc = {
+                    $set: update
+                };
+                const result = yield db.collection('feedbacks').updateOne(filter, updateDoc);
+                return result;
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+        });
+    }
+    updateFeedbackCount(filter, update) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let db;
+            try {
+                db = yield getDb();
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+            try {
+                const updateDoc = {
+                    $push: update,
+                    $inc: { "count": 1 }
+                };
+                const result = yield db.collection('feedbacks').updateOne(filter, updateDoc);
                 return result;
             }
             catch (e) {
@@ -271,9 +330,36 @@ class Database {
     }
     insertFeedback(feedback_info) {
         return __awaiter(this, void 0, void 0, function* () {
+            let db;
             try {
-                const db = yield getDb();
+                db = yield getDb();
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+            try {
                 const result = yield db.collection('feedbacks').insertOne(feedback_info);
+                return result;
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+        });
+    }
+    deleteFeedback(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let db;
+            try {
+                db = yield getDb();
+            }
+            catch (e) {
+                console.log(e);
+                return { error: e.message };
+            }
+            try {
+                const result = yield db.collection('feedbacks').deleteOne(query);
                 return result;
             }
             catch (e) {

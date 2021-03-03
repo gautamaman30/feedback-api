@@ -21,24 +21,13 @@ export default class FeedbackController{
                 }
                 feedbacks[0] = feedback;
             } else if(filter || sort) {
-                const queryMapping = {
-                    "date": "created_on",
-                    "user": "user_id",
-                    "technology": "technology_id",
-                    "count": "count",
-                    "status": "status"
-                }
-                if(filter && sort) {
-                    feedbacks = await feedbackService.getFeedbacksFilteredAndSorted(queryMapping[filter], queryMapping[sort]);
-                }
-                if(filter){
-                    feedbacks = await feedbackService.getFeedbacksFiltered(queryMapping[filter]);
-                }
-                if(sort){
-                    feedbacks = await feedbackService.getFeedbacksSorted(queryMapping[sort]);
-                }
+                feedbacks = await feedbackService.getFeedbacksFilteredAndSorted(filter, sort);
             } else {
                 feedbacks = await feedbackService.getAllFeedbacks();
+            }
+            
+            if(feedbacks.error) {
+                throw new Error(feedbacks.error);
             }
 
             let user: any = await userService.checkUserExist("user_id", user_id);
@@ -107,7 +96,7 @@ export default class FeedbackController{
                 throw new Error(Errors.ADMIN_POST_FEEDBACK);
             }
 
-            let feedback_info: any = {name, feedback, posted_by: user.email};
+            let feedback_info: any = {name, feedback, posted_by: user.email, entity: 'user'};
 
             const check_user: any = await userService.checkUserExist("email", email);
             if(check_user.error){
@@ -116,7 +105,7 @@ export default class FeedbackController{
             if(check_user.user_id === user_id) {
                 throw new Error(Errors.USER_POST_OWN_FEEDBACK)
             }
-            feedback_info.user_id = check_user.user_id;
+            feedback_info.entity_id = check_user.user_id;
 
             const result: any = await feedbackService.addFeedback(feedback_info);
             if(result.error) {
@@ -146,14 +135,13 @@ export default class FeedbackController{
                 throw new Error(Errors.ADMIN_POST_FEEDBACK);
             }
 
-            let feedback_info: any = {name, feedback, posted_by: user.email};
+            let feedback_info: any = {name, feedback, posted_by: user.email, entity: 'technology'};
 
             const technology: any = await technologyService.checkTechnologyExist("name", name);
             if(technology.error) {
                 throw new Error(technology.error);
             }
-            feedback_info.technology_id = technology.technology_id;
-
+            feedback_info.entity_id = technology.technology_id;
 
             const result: any = await feedbackService.addFeedback(feedback_info);
             if(result.error) {

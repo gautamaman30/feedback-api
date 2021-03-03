@@ -1,4 +1,5 @@
 import {MongoClient} from "mongodb"
+import configObj from "../config"
 
 
 export class ConnectDb{
@@ -7,9 +8,9 @@ export class ConnectDb{
     private client: any;
 
     constructor(){
-        this.url = process.env.DB_URL;
-        this.db_name = process.env.DB_NAME;
-        this.client = new MongoClient(this.url, { useNewUrlParser: true, useUnifiedTopology: true });        
+        this.url = configObj.DB_URL;
+        this.db_name = configObj.DB_NAME;
+        this.client = new MongoClient(this.url, { useNewUrlParser: true, useUnifiedTopology: true });
     }
 
     getDb = async () => {
@@ -17,5 +18,5 @@ export class ConnectDb{
             await this.client.connect();
         }
         return this.client.db(this.db_name);
-    }    
-} 
+    }
+}

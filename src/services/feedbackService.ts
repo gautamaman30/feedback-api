@@ -32,50 +32,26 @@ export default class FeedbackService{
         }
     }
 
-    async getFeedbacksFilteredAndSorted(filter, sort){
+    async getFeedbacksFilteredAndSorted(filter?, sort?){
         try{
             let result: any;
-            if(filter === "status"){
-                result = await database.findFeedbacksSorted({"status": "approved"}, sort);
+            if(filter === "status") {
+                filter = {"status": "approved"};
             }
             else {
-                result = await database.findFeedbacksByKeySorted(filter, sort);
+                filter = {"entity": filter};
             }
 
-            if(result.error){
-                throw new Error(Errors.INTERNAL_ERROR);
-            }
-            return result;
-        } catch(err) {
-            console.log(err);
-            return {error: Errors.INTERNAL_ERROR};
-        }
-    }
-
-    async getFeedbacksSorted(sort){
-        try{
-            const result = await database.findFeedbacksSorted({}, sort);
-            if(result.error){
-                throw new Error(Errors.INTERNAL_ERROR);
+            if(sort === "date") {
+                sort = "created_on";
             }
 
-            return result;
-        } catch(err) {
-            console.log(err);
-            return {error: Errors.INTERNAL_ERROR};
-        }
-    }
-
-    async getFeedbacksFiltered(filter){
-        try{
-            let result: any;
-            if(filter === "status"){
-                result = await database.findFeedbacks({"status": "approved"});
+            if(sort) {
+                result = await database.findFeedbacksSorted(filter, sort);
             }
             else {
-                result = await database.findFeedbacksByKey(filter);
+                result = await database.findFeedbacks(filter);
             }
-
             if(result.error){
                 throw new Error(Errors.INTERNAL_ERROR);
             }
@@ -176,35 +152,21 @@ export default class FeedbackService{
         }
     }
 
-    async addFeedback(feedback_info: {name: string, posted_by: string, feedback: string, user_id?: string, technology_id?: string}){
-
+    async addFeedback(feedback_info: {name: string, posted_by: string, feedback: string, entity_id: string, entity: 'user' | 'technology'}){
         try{
             let new_feedback: any;
 
-            if(feedback_info.user_id){
-                new_feedback = {
-                    feedback_id: helperFunctions.generateId(),
-                    posted_by: feedback_info.posted_by,
-                    name: feedback_info.name,
-                    user_id: feedback_info.user_id,
-                    feedback: feedback_info.feedback,
-                    status: 'waiting',
-                    created_on: new Date(),
-                    count: 0,
-                    count_users: []
-                }
-            } else {
-                new_feedback = {
-                    feedback_id: helperFunctions.generateId(),
-                    posted_by: feedback_info.posted_by,
-                    name: feedback_info.name,
-                    technology_id: feedback_info.technology_id,
-                    feedback: feedback_info.feedback,
-                    status: 'waiting',
-                    created_on: new Date(),
-                    count: 0,
-                    count_users: []
-                }
+            new_feedback = {
+                feedback_id: helperFunctions.generateId(),
+                name: feedback_info.name,
+                feedback: feedback_info.feedback,
+                posted_by: feedback_info.posted_by,
+                entity: feedback_info.entity,
+                entity_id: feedback_info.entity_id,
+                status: 'waiting',
+                created_on: new Date(),
+                count: 0,
+                count_users: []
             }
 
             const result = await database.insertFeedback(new_feedback);

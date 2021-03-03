@@ -48,46 +48,19 @@ class FeedbackService {
             try {
                 let result;
                 if (filter === "status") {
-                    result = yield database.findFeedbacksSorted({ "status": "approved" }, sort);
+                    filter = { "status": "approved" };
                 }
                 else {
-                    result = yield database.findFeedbacksByKeySorted(filter, sort);
+                    filter = { "entity": filter };
                 }
-                if (result.error) {
-                    throw new Error(index_2.Errors.INTERNAL_ERROR);
+                if (sort === "date") {
+                    sort = "created_on";
                 }
-                return result;
-            }
-            catch (err) {
-                console.log(err);
-                return { error: index_2.Errors.INTERNAL_ERROR };
-            }
-        });
-    }
-    getFeedbacksSorted(sort) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const result = yield database.findFeedbacksSorted({}, sort);
-                if (result.error) {
-                    throw new Error(index_2.Errors.INTERNAL_ERROR);
-                }
-                return result;
-            }
-            catch (err) {
-                console.log(err);
-                return { error: index_2.Errors.INTERNAL_ERROR };
-            }
-        });
-    }
-    getFeedbacksFiltered(filter) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                let result;
-                if (filter === "status") {
-                    result = yield database.findFeedbacks({ "status": "approved" });
+                if (sort) {
+                    result = yield database.findFeedbacksSorted(filter, sort);
                 }
                 else {
-                    result = yield database.findFeedbacksByKey(filter);
+                    result = yield database.findFeedbacks(filter);
                 }
                 if (result.error) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);
@@ -196,32 +169,18 @@ class FeedbackService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let new_feedback;
-                if (feedback_info.user_id) {
-                    new_feedback = {
-                        feedback_id: index_2.helperFunctions.generateId(),
-                        posted_by: feedback_info.posted_by,
-                        name: feedback_info.name,
-                        user_id: feedback_info.user_id,
-                        feedback: feedback_info.feedback,
-                        status: 'waiting',
-                        created_on: new Date(),
-                        count: 0,
-                        count_users: []
-                    };
-                }
-                else {
-                    new_feedback = {
-                        feedback_id: index_2.helperFunctions.generateId(),
-                        posted_by: feedback_info.posted_by,
-                        name: feedback_info.name,
-                        technology_id: feedback_info.technology_id,
-                        feedback: feedback_info.feedback,
-                        status: 'waiting',
-                        created_on: new Date(),
-                        count: 0,
-                        count_users: []
-                    };
-                }
+                new_feedback = {
+                    feedback_id: index_2.helperFunctions.generateId(),
+                    name: feedback_info.name,
+                    feedback: feedback_info.feedback,
+                    posted_by: feedback_info.posted_by,
+                    entity: feedback_info.entity,
+                    entity_id: feedback_info.entity_id,
+                    status: 'waiting',
+                    created_on: new Date(),
+                    count: 0,
+                    count_users: []
+                };
                 const result = yield database.insertFeedback(new_feedback);
                 if (result.error || result.insertedCount < 1) {
                     throw new Error(index_2.Errors.INTERNAL_ERROR);

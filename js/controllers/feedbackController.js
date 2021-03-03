@@ -28,25 +28,13 @@ class FeedbackController {
                     feedbacks[0] = feedback;
                 }
                 else if (filter || sort) {
-                    const queryMapping = {
-                        "date": "created_on",
-                        "user": "user_id",
-                        "technology": "technology_id",
-                        "count": "count",
-                        "status": "status"
-                    };
-                    if (filter && sort) {
-                        feedbacks = yield index_1.feedbackService.getFeedbacksFilteredAndSorted(queryMapping[filter], queryMapping[sort]);
-                    }
-                    if (filter) {
-                        feedbacks = yield index_1.feedbackService.getFeedbacksFiltered(queryMapping[filter]);
-                    }
-                    if (sort) {
-                        feedbacks = yield index_1.feedbackService.getFeedbacksSorted(queryMapping[sort]);
-                    }
+                    feedbacks = yield index_1.feedbackService.getFeedbacksFilteredAndSorted(filter, sort);
                 }
                 else {
                     feedbacks = yield index_1.feedbackService.getAllFeedbacks();
+                }
+                if (feedbacks.error) {
+                    throw new Error(feedbacks.error);
                 }
                 let user = yield index_1.userService.checkUserExist("user_id", user_id);
                 if (user.error) {
@@ -110,7 +98,7 @@ class FeedbackController {
                 if (user.roles === "admin") {
                     throw new Error(index_2.Errors.ADMIN_POST_FEEDBACK);
                 }
-                let feedback_info = { name, feedback, posted_by: user.email };
+                let feedback_info = { name, feedback, posted_by: user.email, entity: 'user' };
                 const check_user = yield index_1.userService.checkUserExist("email", email);
                 if (check_user.error) {
                     throw new Error(check_user.error);
@@ -118,7 +106,7 @@ class FeedbackController {
                 if (check_user.user_id === user_id) {
                     throw new Error(index_2.Errors.USER_POST_OWN_FEEDBACK);
                 }
-                feedback_info.user_id = check_user.user_id;
+                feedback_info.entity_id = check_user.user_id;
                 const result = yield index_1.feedbackService.addFeedback(feedback_info);
                 if (result.error) {
                     throw new Error(result.error);
@@ -146,12 +134,12 @@ class FeedbackController {
                 if (user.roles === "admin") {
                     throw new Error(index_2.Errors.ADMIN_POST_FEEDBACK);
                 }
-                let feedback_info = { name, feedback, posted_by: user.email };
+                let feedback_info = { name, feedback, posted_by: user.email, entity: 'technology' };
                 const technology = yield index_1.technologyService.checkTechnologyExist("name", name);
                 if (technology.error) {
                     throw new Error(technology.error);
                 }
-                feedback_info.technology_id = technology.technology_id;
+                feedback_info.entity_id = technology.technology_id;
                 const result = yield index_1.feedbackService.addFeedback(feedback_info);
                 if (result.error) {
                     throw new Error(result.error);

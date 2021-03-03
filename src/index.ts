@@ -1,6 +1,7 @@
 import express from "express"
 import http from "http"
 import {RoutesHandler} from "./routes/index"
+import configObj from "./config"
 
 
 const app: express.Application = express();
@@ -14,5 +15,4 @@ const router = new RoutesHandler();
 app.use('/api/v1', router.configureRoutes());
 
 
-const PORT = process.env.PORT || process.argv[2] || 3000;
-server.listen(PORT, () => console.log(`server is running at ${PORT}`));
+server.listen(configObj.PORT, () => console.log(`server is running at ${configObj.PORT}`));

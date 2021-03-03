@@ -5,8 +5,14 @@ const getDb = new ConnectDb().getDb;
 export class Database{
 
     async findAll(collectionName: string){
+        let db: any;
+        try {
+            db = await getDb();
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
         try{
-            const db = await getDb();
             const result = await db.collection(`${collectionName}`).find({}).toArray();
             return result;
         } catch(e){
@@ -15,87 +21,17 @@ export class Database{
         }
     }
 
-    async findFeedbacksSorted(query, sortField){
-        try{
-
-            const sortQuery = {};
-            sortQuery[sortField] = -1;
-
-            const db = await getDb();
-            const result = await db.collection("feedbacks").find(query).sort(sortQuery).toArray();
-            return result;
+    async insertUser(user_info){
+        let db: any;
+        try {
+            db = await getDb();
         } catch(e){
             console.log(e);
             return {error: e.message};
         }
-    }
 
-    async findFeedbacksByKeySorted(query, sortField){
         try{
-            let filterQuery: any = {};
-            filterQuery[query] = { $exists: true };
-
-            const sortQuery = {};
-            sortQuery[sortField] = -1;
-
-            const db = await getDb();
-            let result = await db.collection("feedbacks").find(filterQuery);
-            result = await result.sort(sortField).toArray();
-
-            return result;
-        } catch(e){
-            console.log(e);
-            return {error: e.message};
-        }
-    }
-
-    async findFeedbacks(query){
-        try{
-            const db = await getDb();
-            const result = await db.collection("feedbacks").find(query).toArray();
-            return result;
-        } catch(e){
-            console.log(e);
-            return {error: e.message};
-        }
-    }
-
-    async findFeedbacksByKey(query){
-        try{
-            let filterQuery: any = {};
-            filterQuery[query] = { $exists: true };
-
-            const db = await getDb();
-            const result = await db.collection("feedbacks").find(filterQuery).toArray();
-            return result;
-        } catch(e){
-            console.log(e);
-            return {error: e.message};
-        }
-    }
-
-    async updateFeedback(filter, update){
-        try{
-            const updateDoc = {
-                $set: update
-            }
-            const db = await getDb();
-            const result = await db.collection('feedbacks').updateOne(filter, updateDoc);
-            return result;
-        } catch(e){
-            console.log(e);
-            return {error: e.message};
-        }
-    }
-
-    async updateFeedbackCount(filter, update){
-        try{
-            const updateDoc = {
-                $push: update,
-                $inc: { "count": 1}
-            }
-            const db = await getDb();
-            const result = await db.collection('feedbacks').updateOne(filter, updateDoc);
+            const result = await db.collection('users').insertOne(user_info);
             return result;
         } catch(e){
             console.log(e);
@@ -104,11 +40,18 @@ export class Database{
     }
 
     async updateUser(filter, update){
+        let db: any;
+        try {
+            db = await getDb();
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+
         try{
             const updateDoc = {
                 $set: update
             }
-            const db = await getDb();
             const result = await db.collection('users').updateOne(filter, updateDoc);
             return result;
         } catch(e){
@@ -117,45 +60,16 @@ export class Database{
         }
     }
 
-    async updateTechnology(filter, update){
-        try{
-            const updateDoc = {
-                $set: update
-            }
-            const db = await getDb();
-            const result = await db.collection('technologies').updateOne(filter, updateDoc);
-            return result;
-        } catch(e){
-            console.log(e);
-            return {error: e.message};
-        }
-    }
-
-    async deleteFeedback(query){
-        try{
-            const db = await getDb();
-            const result = await db.collection('feedbacks').deleteOne(query);
-            return result;
-        } catch(e){
-            console.log(e);
-            return {error: e.message};
-        }
-    }
-
-    async deleteTechnology(query){
-        try{
-            const db = await getDb();
-            const result = await db.collection('technologies').deleteOne(query);
-            return result;
-        } catch(e){
-            console.log(e);
-            return {error: e.message};
-        }
-    }
-
     async deleteUser(query){
+        let db: any;
+        try {
+            db = await getDb();
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+
         try{
-            const db = await getDb();
             const result = await db.collection('users').deleteOne(query);
             return result;
         } catch(e){
@@ -165,8 +79,15 @@ export class Database{
     }
 
     async findUser(query){
+        let db: any;
+        try {
+            db = await getDb();
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+
         try{
-            const db = await getDb();
             const result = await db.collection('users').findOne(query);
             return result;
         } catch(e){
@@ -176,8 +97,15 @@ export class Database{
     }
 
     async findUsers(query){
+        let db: any;
+        try {
+            db = await getDb();
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+
         try{
-            const db = await getDb();
             const result = await db.collection('users').find(query);
             return result;
         } catch(e){
@@ -187,8 +115,15 @@ export class Database{
     }
 
     async findTechnology(query){
+        let db: any;
+        try {
+            db = await getDb();
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+
         try{
-            const db = await getDb();
             const result = await db.collection('technologies').findOne(query);
             return result;
         } catch(e){
@@ -197,10 +132,20 @@ export class Database{
         }
     }
 
-    async findFeedback(query){
+    async updateTechnology(filter, update){
+        let db: any;
+        try {
+            db = await getDb();
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+
         try{
-            const db = await getDb();
-            const result = await db.collection('feedbacks').findOne(query);
+            const updateDoc = {
+                $set: update
+            }
+            const result = await db.collection('technologies').updateOne(filter, updateDoc);
             return result;
         } catch(e){
             console.log(e);
@@ -208,10 +153,17 @@ export class Database{
         }
     }
 
-    async insertUser(user_info){
+    async deleteTechnology(query){
+        let db: any;
+        try {
+            db = await getDb();
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+
         try{
-            const db = await getDb();
-            const result = await db.collection('users').insertOne(user_info);
+            const result = await db.collection('technologies').deleteOne(query);
             return result;
         } catch(e){
             console.log(e);
@@ -220,8 +172,15 @@ export class Database{
     }
 
     async insertTechnology(technology_info){
+        let db: any;
+        try {
+            db = await getDb();
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+
         try{
-            const db = await getDb();
             const result = await db.collection('technologies').insertOne(technology_info);
             return result;
         } catch(e){
@@ -230,10 +189,135 @@ export class Database{
         }
     }
 
-    async insertFeedback(feedback_info){
+    async findFeedback(query){
+        let db: any;
+        try {
+            db = await getDb();
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+
         try{
-            const db = await getDb();
+            const result = await db.collection('feedbacks').findOne(query);
+            return result;
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+    }
+
+    async findFeedbacks(query){
+        let db: any;
+        try {
+            db = await getDb();
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+
+        try{
+            const result = await db.collection("feedbacks").find(query).toArray();
+            return result;
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+    }
+
+    async findFeedbacksSorted(query, sortField){
+        let db: any;
+        try {
+            db = await getDb();
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+
+        try{
+            const sortQuery = {};
+            sortQuery[sortField] = -1;
+
+            const result = await db.collection("feedbacks").find(query).sort(sortQuery).toArray();
+            return result;
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+    }
+
+    async updateFeedback(filter, update){
+        let db: any;
+        try {
+            db = await getDb();
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+
+        try{
+            const updateDoc = {
+                $set: update
+            }
+            const result = await db.collection('feedbacks').updateOne(filter, updateDoc);
+            return result;
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+    }
+
+    async updateFeedbackCount(filter, update){
+        let db: any;
+        try {
+            db = await getDb();
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+
+        try{
+            const updateDoc = {
+                $push: update,
+                $inc: { "count": 1}
+            }
+            const result = await db.collection('feedbacks').updateOne(filter, updateDoc);
+            return result;
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+    }
+
+    async insertFeedback(feedback_info){
+        let db: any;
+        try {
+            db = await getDb();
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+
+        try{
             const result = await db.collection('feedbacks').insertOne(feedback_info);
+            return result;
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+    }
+
+    async deleteFeedback(query){
+        let db: any;
+        try {
+            db = await getDb();
+        } catch(e){
+            console.log(e);
+            return {error: e.message};
+        }
+
+        try{
+            const result = await db.collection('feedbacks').deleteOne(query);
             return result;
         } catch(e){
             console.log(e);
