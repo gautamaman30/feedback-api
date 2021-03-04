@@ -2,10 +2,8 @@ import { join } from "path"
 import dotenv from "dotenv"
 
 
-const NODE_ENV = process.env.NODE_ENV || 'development';
-
 dotenv.config({
-    path: join(process.cwd(),`${NODE_ENV}.env`)
+    path: join(process.cwd(), `${process.env.NODE_ENV}.env`)
 })
 
 

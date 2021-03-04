@@ -6,14 +6,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthMiddleware = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const index_1 = require("../utils/index");
+const config_1 = __importDefault(require("../config"));
 class AuthMiddleware {
     signToken(req, res, next) {
         const signOptions = {
-            issuer: process.env.JWT_TOKEN_ISSUER,
-            expiresIn: process.env.JWT_TOKEN_EXPIRES_IN,
-            algorithm: process.env.JWT_TOKEN_ALGORITHM
+            issuer: config_1.default.JWT_TOKEN_ISSUER,
+            expiresIn: config_1.default.JWT_TOKEN_EXPIRES_IN,
+            algorithm: config_1.default.JWT_TOKEN_ALGORITHM
         };
-        const key = process.env.SECRET_KEY;
+        const key = config_1.default.SECRET_KEY;
         let payload = JSON.parse(res.get("payload"));
         jsonwebtoken_1.default.sign(payload, key, signOptions, function (err, token) {
             if (err) {
@@ -32,7 +33,7 @@ class AuthMiddleware {
         if (req.headers.authorization) {
             token = req.headers.authorization.split(' ')[1];
         }
-        jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY, function (err, result) {
+        jsonwebtoken_1.default.verify(token, config_1.default.SECRET_KEY, function (err, result) {
             if (err) {
                 console.log(err);
                 res.status(401);

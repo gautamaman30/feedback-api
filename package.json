@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc && cross-env NODE_ENV=development && node ./js/index",
-    "stage": "tsc && cross-env NODE_ENV=staging && node ./js/index",
-    "prod": "tsc && cross-env NODE_ENV=production && node ./js/index",
+    "dev": "tsc && set NODE_ENV=development&& node ./js/index",
+    "stage": "tsc && set NODE_ENV=staging&& node ./js/index",
+    "prod": "tsc && set NODE_ENV=production&& node ./js/index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Aman Gautam",

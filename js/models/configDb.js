@@ -8,9 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConnectDb = void 0;
 const mongodb_1 = require("mongodb");
+const config_1 = __importDefault(require("../config"));
 class ConnectDb {
     constructor() {
         this.getDb = () => __awaiter(this, void 0, void 0, function* () {
@@ -19,8 +23,8 @@ class ConnectDb {
             }
             return this.client.db(this.db_name);
         });
-        this.url = process.env.DB_URL;
-        this.db_name = process.env.DB_NAME;
+        this.url = config_1.default.DB_URL;
+        this.db_name = config_1.default.DB_NAME;
         this.client = new mongodb_1.MongoClient(this.url, { useNewUrlParser: true, useUnifiedTopology: true });
     }
     ;
